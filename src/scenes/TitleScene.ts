@@ -24,7 +24,7 @@ const TITLE_STRIP_GAP = 8;
 const TITLE_STRIP_PAD_X = 12;
 const TITLE_STRIP_PAD_Y = 5;
 // `reference/design/Game UI.dc.html:170` `box-shadow: 0 0 0 3px #1a4f82`.
-const TITLE_STRIP_STROKE_WIDTH = 3;
+const TITLE_STRIP_BORDER = 3;
 // Same line's `background: rgba(4, 10, 30, .82)` — `COLORS.titleFill` is that same rgb triple.
 const TITLE_STRIP_FILL_ALPHA = 0.82;
 
@@ -37,6 +37,11 @@ const PROMPT_MARKER_GAP = 14;
 const PROMPT_MARKER_SIZE = 9;
 // `reference/design/Scene 2 - Rooftop Relief.dc.html:118` `bottom: 18px`.
 const PROMPT_BOTTOM_Y = 18;
+
+// `reference/design/Game UI.dc.html:163` `letter-spacing: .04em` at 19 px scales to `.04 * 24 = 0.96` for the pressstart-24 title run, rounded to a whole pixel.
+const TITLE_LETTER_SPACING = 1;
+// `reference/design/Game UI.dc.html:170-172`'s `.12em` at 11 px and `reference/design/Scene 2 - Rooftop Relief.dc.html:121`'s `.12em` at 13 px both scale to `.12 * 16 = 1.92` for silkscreen-16 runs, rounded to a whole pixel.
+const SILKSCREEN_LETTER_SPACING = 2;
 
 export class TitleScene extends Phaser.Scene {
   private blinkEnabled = true;
@@ -63,7 +68,9 @@ export class TitleScene extends Phaser.Scene {
   }
 
   private buildTitleBlock(): void {
-    const shadowLabel = this.add.bitmapText(0, 0, "pressstart-24", "SPIDEY WARS");
+    const shadowLabel = this.add
+      .bitmapText(0, 0, "pressstart-24", "SPIDEY WARS")
+      .setLetterSpacing(TITLE_LETTER_SPACING);
     const textW = Math.round(shadowLabel.width);
     const textH = Math.round(shadowLabel.height);
 
@@ -98,11 +105,14 @@ export class TitleScene extends Phaser.Scene {
       .setDepth(2);
     this.add
       .bitmapText(textX, textY, "pressstart-24", "SPIDEY WARS")
+      .setLetterSpacing(TITLE_LETTER_SPACING)
       .setOrigin(0, 0)
       .setTint(COLORS.titleText)
       .setDepth(3);
 
-    const subtitleLabel = this.add.bitmapText(0, 0, "silkscreen-16", SUBTITLE);
+    const subtitleLabel = this.add
+      .bitmapText(0, 0, "silkscreen-16", SUBTITLE)
+      .setLetterSpacing(SILKSCREEN_LETTER_SPACING);
     const subtitleTextW = Math.round(subtitleLabel.width);
     const subtitleTextH = Math.round(subtitleLabel.height);
     const stripW = subtitleTextW + 2 * TITLE_STRIP_PAD_X;
@@ -110,21 +120,43 @@ export class TitleScene extends Phaser.Scene {
     const stripX = Math.round((WIDTH - stripW) / 2);
     const stripY = titleY + titleH + TITLE_STRIP_GAP;
 
+    // A stroke centred on the rectangle's own path would eat half the coded padding, so the border is four opaque bands outside the fill's footprint, leaving the translucent fill to composite only against the sky underneath it.
+    const stripBorderX = stripX - TITLE_STRIP_BORDER;
+    const stripBorderY = stripY - TITLE_STRIP_BORDER;
+    const stripOuterW = stripW + 2 * TITLE_STRIP_BORDER;
+    this.add
+      .rectangle(stripBorderX, stripBorderY, stripOuterW, TITLE_STRIP_BORDER, COLORS.frameMid)
+      .setOrigin(0, 0)
+      .setDepth(1);
+    this.add
+      .rectangle(stripBorderX, stripY + stripH, stripOuterW, TITLE_STRIP_BORDER, COLORS.frameMid)
+      .setOrigin(0, 0)
+      .setDepth(1);
+    this.add
+      .rectangle(stripBorderX, stripY, TITLE_STRIP_BORDER, stripH, COLORS.frameMid)
+      .setOrigin(0, 0)
+      .setDepth(1);
+    this.add
+      .rectangle(stripX + stripW, stripY, TITLE_STRIP_BORDER, stripH, COLORS.frameMid)
+      .setOrigin(0, 0)
+      .setDepth(1);
+
     this.add
       .rectangle(stripX, stripY, stripW, stripH, COLORS.titleFill, TITLE_STRIP_FILL_ALPHA)
       .setOrigin(0, 0)
-      .setStrokeStyle(TITLE_STRIP_STROKE_WIDTH, COLORS.frameMid)
-      .setDepth(1);
+      .setDepth(2);
 
     subtitleLabel
       .setPosition(stripX + TITLE_STRIP_PAD_X, stripY + TITLE_STRIP_PAD_Y)
       .setOrigin(0, 0)
       .setTint(COLORS.titleText)
-      .setDepth(2);
+      .setDepth(3);
   }
 
   private buildPromptBlock(): void {
-    const label = this.add.bitmapText(0, 0, "silkscreen-16", PROMPT_LABEL);
+    const label = this.add
+      .bitmapText(0, 0, "silkscreen-16", PROMPT_LABEL)
+      .setLetterSpacing(SILKSCREEN_LETTER_SPACING);
     const textW = Math.round(label.width);
     const textH = Math.round(label.height);
 
