@@ -1,0 +1,4 @@
+# One line per accepted finding, in the form
+# CVE-… # <date> <package> — transitive via <parent>, no fix released; revisit <date+14d>
+# A finding with a direct bump path is fixed by bumping, never listed here, and the scan's
+# `ignore-unfixed: true` already drops findings upstream has no fix for at all.

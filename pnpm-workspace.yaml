@@ -1,3 +1,5 @@
 # Packages whose install scripts pnpm may run.
 allowBuilds:
   esbuild: true
+  # lefthook's postinstall unpacks the platform binary that `prepare` then runs.
+  lefthook: true

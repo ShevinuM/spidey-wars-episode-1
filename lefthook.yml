@@ -1,0 +1,20 @@
+# A globbed hook is skipped entirely when no staged file matches it
+# (docs/rules/general/toolchain.md R007), so a docs-only commit runs only the ungated jobs.
+pre-commit:
+  parallel: true
+  jobs:
+    - name: typecheck
+      run: pnpm typecheck
+    - name: lint
+      glob: "*.ts"
+      run: pnpm exec oxlint --deny-warnings {staged_files}
+    - name: format
+      glob: "*.{ts,json,jsonc,md,yml,yaml,html,css}"
+      run: pnpm exec prettier --check {staged_files}
+    # gitleaks ships no npm package, so it is the one tool here not resolved through pnpm.
+    - name: secrets
+      run: gitleaks git --pre-commit --staged
+# There is deliberately no actionlint job. actionlint ships no usable npm CLI — the `actionlint`
+# package is a stale WASM library with an empty `bin` field — so it cannot be resolved through
+# pnpm (docs/rules/general/toolchain.md R008). Workflow linting therefore runs in CI only, as
+# `ci.yml`'s "Lint workflows" step, pinned by version and SHA-256 checksum.

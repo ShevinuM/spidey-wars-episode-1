@@ -11,6 +11,7 @@
     "build": "vite build",
     "build:test": "vite build --mode test",
     "preview": "vite preview",
+    "prepare": "lefthook install",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint --deny-warnings",
     "architecture": "depcruise src test scripts --config .dependency-cruiser.mjs --output-type err-long",
@@ -18,6 +19,7 @@
     "format:write": "prettier --write .",
     "duplication": "jscpd",
     "knip": "knip",
+    "size": "size-limit",
     "check": "pnpm typecheck && pnpm lint && pnpm architecture && pnpm format && pnpm duplication && pnpm knip",
     "test:unit": "vitest run",
     "test:unit:coverage": "vitest run --coverage",
@@ -28,18 +30,36 @@
     "coverage:merge": "mcr merge -r lcov,v8 --inputDir coverage/unit,coverage/e2e/raw --outputDir coverage/merged",
     "playwright:install": "playwright install --with-deps chromium"
   },
+  "size-limit": [
+    {
+      "name": "js",
+      "path": "dist/assets/*.js",
+      "gzip": true,
+      "limit": "430 kB"
+    },
+    {
+      "name": "total",
+      "path": "dist/**/*",
+      "gzip": false,
+      "brotli": false,
+      "limit": "1600 kB"
+    }
+  ],
   "devDependencies": {
     "@fast-check/vitest": "0.5.0",
     "@playwright/test": "1.63.0",
+    "@size-limit/file": "14.0.0",
     "@types/node": "26.6.1",
     "@vitest/coverage-v8": "5.0.1",
     "dependency-cruiser": "18.3.1",
     "jscpd": "5.2.1",
     "knip": "6.36.0",
+    "lefthook": "2.1.14",
     "monocart-coverage-reports": "2.13.0",
     "oxlint": "1.83.0",
     "phaser": "4.2.1",
     "prettier": "3.9.7",
+    "size-limit": "14.0.0",
     "typescript": "5.9.3",
     "vite": "7.3.6",
     "vitest": "5.0.1"

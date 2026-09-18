@@ -1,0 +1,36 @@
+# Takes effect only once this file is on the default branch — Dependabot reads its
+# config from `main`, not from the pull request that adds it.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 3
+    groups:
+      dev-dependencies:
+        dependency-type: "development"
+    ignore:
+      # docs/rules/tech-stack/playwright.md R008 pins the npm version and the Docker image
+      # tag to the identical string, and the visual baselines are captured against that
+      # exact Chromium build. An auto-bump PR would break both. Bump Playwright by hand,
+      # with the image tag and a re-baseline in the same change.
+      - dependency-name: "@playwright/test"
+
+  # Every third-party GitHub Action is pinned to a full commit SHA, so none of them ever
+  # updates on its own. This ecosystem is what keeps those SHAs current — without it,
+  # pinning for security would freeze every action at today's commit forever.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 3
+
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 3
