@@ -1,0 +1,52 @@
+name: Image scan
+
+on:
+  # Weekly, because the finding that matters is the one that appears in an image nobody
+  # touched. Reporting only on this trigger: a new CVE in someone else's base image is not
+  # a defect in the commit that happened to be on main that morning.
+  schedule:
+    - cron: "17 4 * * 1"
+  # Blocking when the Dockerfile itself changes — that is a deliberate act with an author
+  # to answer for it.
+  pull_request:
+    paths:
+      - "Dockerfile.visual"
+      - ".trivyignore"
+      - ".github/workflows/trivy-image.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: trivy-image-${{ github.head_ref || github.sha }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  trivy-image:
+    name: trivy-image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # ci.yml's `visual` job pulls the pinned base image through `container:`; it never
+      # builds this file. Building it here is the only thing in CI that proves
+      # Dockerfile.visual still works at all — and it is why the scan below points at the
+      # built tag rather than at the base image, which would make this step decorative.
+      - name: Build the visual-testing image
+        run: docker build -f Dockerfile.visual -t spidey-visual:ci .
+
+      - name: Trivy image vulnerability scan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: image
+          image-ref: spidey-visual:ci
+          scanners: vuln
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          # Report on the schedule, block on a pull request. A manual dispatch blocks too,
+          # so a red dispatch run means a real finding (or a broken build), not noise.
+          exit-code: ${{ github.event_name == 'schedule' && '0' || '1' }}
+          # A full Playwright image has far more packages than the 5-minute default was
+          # sized for.
+          timeout: 10m

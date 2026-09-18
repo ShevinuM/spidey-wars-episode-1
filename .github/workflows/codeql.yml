@@ -1,0 +1,55 @@
+name: CodeQL
+
+# No paths/paths-ignore/branches filter on the pull_request trigger: a workflow that does
+# not fire reports nothing, and a required context that never reports blocks merges
+# forever. Every PR here targets main, so a branches filter would be a no-op today and a
+# landmine later.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: codeql-${{ github.head_ref || github.sha }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write
+  # Required for the `actions` language, which reads workflow run metadata.
+  actions: read
+
+jobs:
+  # The job name is deliberately just "CodeQL": branch protection matches a check run by
+  # its exact string, and GitHub appends each matrix value in parentheses on top of the
+  # job name, producing two independent check runs rather than one. The aggregate "CodeQL"
+  # name is never itself a check run, so it is never registered as a required context —
+  # read the live names off a real pull request instead of retyping them from here.
+  analyze:
+    name: CodeQL
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # The game's TypeScript surface. build-mode: none — CodeQL's JS/TS extractor
+          # reads sources directly, and a Vite build would only hide them behind a bundle.
+          - language: javascript-typescript
+            build-mode: none
+          # This repo's own workflow files, for Actions vulnerabilities: script injection
+          # through untrusted event input, over-broad permissions, unpinned actions.
+          - language: actions
+            build-mode: none
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0
+        with:
+          category: "/language:${{ matrix.language }}"
