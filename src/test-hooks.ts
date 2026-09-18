@@ -26,11 +26,11 @@ export function installTestHooks(game: Phaser.Game): void {
 
     goto(scene: string, data?: unknown): Promise<void> {
       return new Promise((resolve) => {
-        game.scene.start(scene, data as object | undefined);
         const target = game.scene.getScene(scene);
         target.events.once(Phaser.Scenes.Events.CREATE, () => {
           game.events.once(Phaser.Core.Events.POST_RENDER, () => resolve());
         });
+        game.scene.start(scene, data as object | undefined);
       });
     },
 
