@@ -8,9 +8,14 @@ on:
     tags: ["v*"]
   workflow_dispatch:
 
+# Never cancelled mid-flight, for the same reason `deploy.yml`'s publish job and
+# `update-baselines.yml` are not: `butler push` is a durable write to an itch.io channel, and
+# killing it discards a release rather than superseding one. `github.head_ref` is empty on
+# both of this workflow's triggers, so keying on it would collapse the group to the commit
+# SHA and let a second run cancel the first — the failure observed on `update-baselines`.
 concurrency:
-  group: deploy-itch-${{ github.head_ref || github.sha }}
-  cancel-in-progress: true
+  group: deploy-itch-${{ github.ref }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
