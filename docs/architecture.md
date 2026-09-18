@@ -74,7 +74,7 @@ src/
     tuning.ts               EVERY magic number: gravity, swing torque, bat speed, fall time
     cutscenes/1-3.ts        Beat[] data per scene
 
-  types/
+  types/                   BANNED — a type lives with its owner; see docs/rules/general/files-and-naming.md
 ```
 
 ---
