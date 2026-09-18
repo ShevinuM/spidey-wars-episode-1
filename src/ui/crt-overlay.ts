@@ -27,7 +27,10 @@ export function crtOverlay(g: Phaser.GameObjects.Graphics, w: number, h: number)
     g.fillStyle(COLORS.skyTop, alpha);
     g.fillRect(inset, inset, innerW, ringStep);
     g.fillRect(inset, h - inset - ringStep, innerW, ringStep);
-    g.fillRect(inset, inset, ringStep, innerH);
-    g.fillRect(w - inset - ringStep, inset, ringStep, innerH);
+    const sideH = innerH - 2 * ringStep;
+    if (sideH > 0) {
+      g.fillRect(inset, inset + ringStep, ringStep, sideH);
+      g.fillRect(w - inset - ringStep, inset + ringStep, ringStep, sideH);
+    }
   }
 }
