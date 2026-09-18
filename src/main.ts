@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import { BootScene } from "./scenes/BootScene.ts";
+import { TitleScene } from "./scenes/TitleScene.ts";
 import { installTestHooks } from "./test-hooks.ts";
 
 const game = new Phaser.Game({
@@ -12,7 +13,7 @@ const game = new Phaser.Game({
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [BootScene],
+  scene: [BootScene, TitleScene],
 });
 
 if (__TEST__) {

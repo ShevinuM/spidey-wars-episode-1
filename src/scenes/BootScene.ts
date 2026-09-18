@@ -102,6 +102,7 @@ export class BootScene extends Phaser.Scene {
     });
 
     window.__READY__ = true;
+    this.scene.launch("TitleScene");
   }
 
   /** Draws into a throwaway `Graphics` object, snapshots it as a texture, then destroys it — never left in the display list (`docs/rules/tech-stack/phaser.md` R005). */

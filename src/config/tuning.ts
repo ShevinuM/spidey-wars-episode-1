@@ -66,3 +66,6 @@ export const CRT_VIGNETTE_WIDTH = 150;
 
 /** Number of concentric rings `crtOverlay` layers across `CRT_VIGNETTE_WIDTH` to approximate the blurred falloff. */
 export const CRT_VIGNETTE_RINGS = 30;
+
+/** Prompt blink half-period, ms — `reference/design/Scene 2 - Rooftop Relief.dc.html`'s `animation: blink 0.9s steps(1, end)`, halved for a hard visible/hidden toggle. */
+export const BLINK_MS = 450;
