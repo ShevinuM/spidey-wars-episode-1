@@ -22,12 +22,18 @@ export function seedRand(seed: number): () => number {
 }
 
 export function randInt(state: number, min: number, max: number): RandStep<number> {
+  if (min > max) {
+    throw new RangeError(`randInt: min (${min}) must not exceed max (${max})`);
+  }
   const next = nextRand(state);
   const span = max - min + 1;
   return { value: min + Math.floor(next.value * span), state: next.state };
 }
 
 export function pick<T>(state: number, items: readonly T[]): RandStep<T> {
+  if (items.length === 0) {
+    throw new RangeError("pick: items must not be empty");
+  }
   const next = randInt(state, 0, items.length - 1);
   return { value: items[next.value], state: next.state };
 }

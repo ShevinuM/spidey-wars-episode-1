@@ -65,6 +65,10 @@ test.describe("__TEST__ hooks", () => {
     expect(await hooks.ready()).toBe(true);
   });
 
+  test("goto rejects with a clear message for an unregistered scene key", async ({ hooks }) => {
+    await expect(hooks.goto("NotARealScene")).rejects.toThrow(/NotARealScene/);
+  });
+
   test("freeze stops the scene clock from advancing", async ({ hooks, page }) => {
     await hooks.goto("BootScene");
 

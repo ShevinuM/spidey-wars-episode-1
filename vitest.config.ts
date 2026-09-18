@@ -6,7 +6,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: ["src/sim/**/*.ts", "src/cutscene/**/*.ts", "scripts/lib/**/*.ts"],
-      exclude: ["**/*.test.ts"],
+      exclude: ["**/*.test.ts", "src/sim/__canary-violation.ts"],
       reportsDirectory: "coverage/unit",
       reporter: ["text", "lcov"],
       thresholds: {

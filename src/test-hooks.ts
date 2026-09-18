@@ -28,8 +28,14 @@ export function installTestHooks(game: Phaser.Game): void {
     },
 
     goto(scene: string, data?: unknown): Promise<void> {
-      return new Promise((resolve) => {
-        const target = game.scene.getScene(scene);
+      return new Promise((resolve, reject) => {
+        // Phaser types getScene() as always returning a Scene, but it returns null at
+        // runtime for an unregistered key (SceneManager.getScene, phaser@4.2.1).
+        const target = game.scene.getScene(scene) as Phaser.Scene | null;
+        if (target === null) {
+          reject(new Error(`goto: no scene registered with key "${scene}"`));
+          return;
+        }
         target.events.once(Phaser.Scenes.Events.CREATE, () => {
           sceneClockProbe = target.time.addEvent({ delay: SCENE_CLOCK_PROBE_DELAY_MS });
           game.events.once(Phaser.Core.Events.POST_RENDER, () => resolve());

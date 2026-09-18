@@ -55,6 +55,10 @@ describe("randInt", () => {
     const next = randInt(42, 5, 5);
     expect(next.value).toBe(5);
   });
+
+  it("throws when min exceeds max", () => {
+    expect(() => randInt(1, 10, 5)).toThrow(RangeError);
+  });
 });
 
 describe("pick", () => {
@@ -71,5 +75,9 @@ describe("pick", () => {
   it("returns the only element from a single-item list", () => {
     const next = pick(9, ["only"]);
     expect(next.value).toBe("only");
+  });
+
+  it("throws when items is empty", () => {
+    expect(() => pick(1, [])).toThrow(RangeError);
   });
 });

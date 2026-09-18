@@ -1,18 +1,9 @@
 {
   "entry": [
-    "src/main.ts",
     "scripts/*.ts",
     "test/**/*.spec.ts",
     "test/audits/**/*.test.ts",
     "test/support/static-server.ts",
   ],
   "project": ["src/**/*.ts", "scripts/**/*.ts", "test/**/*.ts"],
-  "ignore": [
-    "reference/**",
-    "Tasks/**",
-    ".claude/**",
-    ".remember/**",
-    ".memsearch/**",
-    "ds-bundle/**",
-  ],
 }

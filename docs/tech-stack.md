@@ -216,7 +216,7 @@ The mockup implies a 702px play area inside a 15px frame (4+8+3 padding each sid
 
 ## Scanlines + vignette
 
-`camera.filters.internal` / `.external` in Phaser 4 ship Barrel, Blur, ColorMatrix, Glow, Pixelate and others. **Vignette is not confirmed present in the 4.x list** (it was `postFX.addVignette` in 3.x) — check before relying on it.
+`camera.filters.internal` / `.external` in Phaser 4 ship Barrel, Blur, ColorMatrix, Glow, Pixelate, Vignette, and others — Vignette is **confirmed present** in 4.x (`docs/rules/tech-stack/phaser.md` R007; it was `postFX.addVignette` in 3.x).
 
 Two safe paths:
 

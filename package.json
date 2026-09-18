@@ -13,7 +13,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint --deny-warnings",
-    "architecture": "depcruise src --config .dependency-cruiser.mjs --output-type err-long",
+    "architecture": "depcruise src test scripts --config .dependency-cruiser.mjs --output-type err-long",
     "format": "prettier --check .",
     "format:write": "prettier --write .",
     "duplication": "jscpd",

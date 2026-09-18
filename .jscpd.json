@@ -1,5 +1,5 @@
 {
-  "path": ["src"],
+  "path": ["src", "test", "scripts"],
   "minTokens": 50,
   "threshold": 1,
   "reporters": ["console"],
