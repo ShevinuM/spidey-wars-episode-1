@@ -5,6 +5,7 @@ import { stepTo as simStepTo } from "./sim/tick.ts";
 import { newWorld, type World } from "./sim/world.ts";
 
 const DEFAULT_SEED = 20260912;
+const SCENE_CLOCK_PROBE_DELAY_MS = 24 * 60 * 60 * 1000;
 
 export interface TestHooks {
   ready(): boolean;
@@ -18,6 +19,8 @@ export interface TestHooks {
 
 export function installTestHooks(game: Phaser.Game): void {
   let world: World = newWorld(DEFAULT_SEED);
+  // Advances only while the current scene's clock runs, so a test can observe freeze() stop it.
+  let sceneClockProbe: Phaser.Time.TimerEvent | undefined;
 
   window.__TEST__ = {
     ready(): boolean {
@@ -28,6 +31,7 @@ export function installTestHooks(game: Phaser.Game): void {
       return new Promise((resolve) => {
         const target = game.scene.getScene(scene);
         target.events.once(Phaser.Scenes.Events.CREATE, () => {
+          sceneClockProbe = target.time.addEvent({ delay: SCENE_CLOCK_PROBE_DELAY_MS });
           game.events.once(Phaser.Core.Events.POST_RENDER, () => resolve());
         });
         game.scene.start(scene, data as object | undefined);
@@ -47,7 +51,10 @@ export function installTestHooks(game: Phaser.Game): void {
     },
 
     state(): unknown {
-      return JSON.parse(JSON.stringify(world));
+      return {
+        ...JSON.parse(JSON.stringify(world)),
+        sceneClockMs: sceneClockProbe?.getElapsed() ?? null,
+      };
     },
 
     digest(): string {

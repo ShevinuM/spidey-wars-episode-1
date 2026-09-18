@@ -23,6 +23,8 @@
     "test:unit:coverage": "vitest run --coverage",
     "test:smoke": "playwright test --project=smoke",
     "test:e2e": "playwright test --project=e2e",
+    "test:visual": "playwright test --project=visual",
+    "test:visual:docker": "node scripts/visual-docker.ts",
     "coverage:merge": "mcr merge -r lcov,v8 --inputDir coverage/unit,coverage/e2e/raw --outputDir coverage/merged",
     "playwright:install": "playwright install --with-deps chromium"
   },

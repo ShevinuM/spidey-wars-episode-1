@@ -1,0 +1,15 @@
+FROM mcr.microsoft.com/playwright:v1.63.0-noble
+
+RUN npm i -g pnpm@11.20.0
+
+WORKDIR /app
+
+ENV LEFTHOOK=0 CI=1 VISUAL_CONTAINER=1
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+RUN pnpm install --frozen-lockfile
+
+COPY . .
+RUN pnpm build:test
+
+CMD ["pnpm", "exec", "playwright", "test", "--project=visual"]

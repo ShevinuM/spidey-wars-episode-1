@@ -1,0 +1,13 @@
+node_modules
+dist
+dist-test
+coverage
+test-results
+playwright-report
+.git
+Tasks
+.claude
+.remember
+.memsearch
+reference
+ds-bundle
