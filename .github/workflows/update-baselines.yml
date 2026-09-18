@@ -10,9 +10,16 @@ on:
         required: true
         type: string
 
+# Never cancelled mid-flight, for the same reason deploy's publish job is not: this run
+# commits and pushes baselines, and killing it can leave the branch half-updated.
+# `github.head_ref` is empty on a `workflow_dispatch`, so the group used to collapse to the
+# commit SHA and a second dispatch cancelled the first — observed, not guessed: two
+# dispatches five seconds apart on `main` left the earlier run `cancelled`. Keyed on the ref
+# instead, a later dispatch for the same ref waits for the run in flight rather than killing
+# it.
 concurrency:
-  group: update-baselines-${{ github.head_ref || github.sha }}
-  cancel-in-progress: true
+  group: update-baselines-${{ inputs.ref }}
+  cancel-in-progress: false
 
 permissions:
   contents: write

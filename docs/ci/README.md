@@ -102,8 +102,9 @@ branch's next ordinary push is what re-runs CI against the new baselines.
 **GitHub Pages**, at <https://shevinum.github.io/spidey-wars-episode-1/>, from every push to
 `main`. `deploy.yml`'s `build` job runs `pnpm build` and uploads `dist` as the Pages
 artifact; its `deploy` job publishes that artifact to the `github-pages` environment. The
-publish job is the one job in this repo that is never cancelled by a newer run — a
-cancelled deployment can leave Pages serving a half-updated site. The site sits under a
+publish job is one of the two jobs in this repo never cancelled by a newer run — a
+cancelled deployment can leave Pages serving a half-updated site; the other is
+`update-baselines`, whose run commits and pushes. The site sits under a
 path prefix rather than at the domain root, which works because `vite.config.ts` sets
 `base: './'` and every asset reference in `dist/index.html` is therefore relative; see
 [`../rules/tech-stack/vite.md`](../rules/tech-stack/vite.md).
