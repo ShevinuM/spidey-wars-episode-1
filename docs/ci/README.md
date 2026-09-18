@@ -63,7 +63,8 @@ Branch protection registers its required contexts from the live check-run names 
 pull request, never from a list retyped into a document: GitHub matches a context by exact
 string, and a name that matches nothing blocks every merge forever. The set it registers is
 `changes`, `gate`, `visual`, `pr-title`, and CodeQL's per-language check runs — never the
-aggregate `CodeQL` name, which is a job name rather than a check run. The payload, the
+aggregate check run literally named `CodeQL`, which GitHub emits alongside the two
+per-language runs and which is not one of this repo's own checks. The payload, the
 registration procedure and the merge settings are documented in `branch-protection.md` in
 this directory, which lands together with the protection settings themselves.
 
