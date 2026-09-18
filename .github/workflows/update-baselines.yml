@@ -11,7 +11,9 @@ on:
         type: string
 
 # Never cancelled mid-flight, for the same reason deploy's publish job is not: this run
-# commits and pushes baselines, and killing it can leave the branch half-updated.
+# writes somewhere durable — it commits and pushes baselines — and a cancelled one throws
+# away the re-baseline that was asked for, reporting `cancelled` where pushed baselines were
+# expected.
 # `github.head_ref` is empty on a `workflow_dispatch`, so the group used to collapse to the
 # commit SHA and a second dispatch cancelled the first — observed, not guessed: two
 # dispatches five seconds apart on `main` left the earlier run `cancelled`. Keyed on the ref
