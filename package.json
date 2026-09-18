@@ -20,6 +20,8 @@
     "duplication": "jscpd",
     "knip": "knip",
     "fonts": "node scripts/gen-bitmap-fonts.ts",
+    "sprites:strip": "node scripts/strip-sprites.ts",
+    "atlas": "node scripts/pack-atlas.ts",
     "size": "size-limit",
     "check": "pnpm typecheck && pnpm lint && pnpm architecture && pnpm format && pnpm duplication && pnpm knip",
     "test:unit": "vitest run",

@@ -129,6 +129,14 @@ jobs:
       - run: pnpm duplication
       - run: pnpm knip
 
+      # Regenerating fonts and the atlas is a hypothesis that macOS-arm64 (where the
+      # committed files were generated) and Linux-x64 (this runner) produce byte-identical
+      # sharp output. A red diff here says only that the bytes differ, not whether the
+      # pixels do; the follow-up is a pixel-level compare of the regenerated files, not a
+      # retry.
+      - name: Generated assets are reproducible
+        run: pnpm fonts && pnpm atlas && git diff --exit-code public/
+
       - run: pnpm test:unit:coverage
 
       # Both builds are needed before the browser suites: playwright.config.ts's webServer
