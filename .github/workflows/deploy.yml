@@ -23,8 +23,10 @@ jobs:
       # (has_pages: true, build_type: workflow) and the action's `enablement` input is
       # left at its default of false, so it never attempts to create one.
       pages: read
-    # A newer push supersedes a build still in flight. Unlike the publish job below, a
-    # cancelled build leaves nothing half-finished.
+    # A repeat dispatch of the same commit supersedes a build still in flight; a push always
+    # gets its own group, because `github.head_ref` is empty on both of this workflow's
+    # triggers and the fallback is therefore always the commit SHA. Unlike the publish job
+    # below, a cancelled build leaves nothing half-finished, so that is fine here.
     concurrency:
       group: deploy-${{ github.head_ref || github.sha }}
       cancel-in-progress: true
