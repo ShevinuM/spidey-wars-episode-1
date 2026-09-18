@@ -9,7 +9,7 @@ The two DesignSync rituals — pulling mockups and sprites in, pushing rendered 
 
 ## Precondition
 
-- [ ] **R003** Every DesignSync call — `get_file`, `list_files`, `finalize_plan`, `write_files`, all of them, including the read-only ones — fails with "DesignSync needs design-system authorization" until `/design-login` has been run in that session. It is interactive-only; nothing automated can grant it. Confirm it has been run before the first DesignSync call of either ritual, not after the first failure. This is a DesignSync-tool constant, not something specific to this project's Astro-free stack.
+- [ ] **R003** Every DesignSync call — `get_file`, `list_files`, `finalize_plan`, `write_files`, all of them, including the read-only ones — fails with "DesignSync needs design-system authorization" until `/design-login` has been run in that session. It is interactive-only; nothing automated can grant it. Confirm it has been run before the first DesignSync call of either ritual, not after the first failure. This is a DesignSync-tool constant, not a project-specific setting.
 
 ## Source pull
 
