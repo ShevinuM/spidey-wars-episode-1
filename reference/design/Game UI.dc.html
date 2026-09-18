@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&amp;family=Press+Start+2P&amp;display=swap" rel="stylesheet">
+<style>
+  html, body { height: 100%; margin: 0; background: #060d22; }
+  a { color: #f2a93b; text-decoration: none; }
+  a:hover { color: #ffd27a; }
+  img { image-rendering: pixelated; -webkit-user-drag: none; }
+  @keyframes blink { 0%, 60% { opacity: 1 } 61%, 100% { opacity: .25 } }
+</style>
+</helmet>
+<div style="width: 100%; height: 100%; padding: 0; position: relative; font-family: 'Silkscreen', monospace; display: flex; flex-direction: column; box-sizing: border-box;">
+
+  <!-- CORNER SPIDER BADGES: fixed to the border frame, sit outside the scroll area -->
+  <sc-for list="{{ cornerBadges }}" as="corner" hint-placeholder-count="4">
+    <div style="position: absolute; left: {{ corner.left }}; top: {{ corner.top }}; transform: translate(-50%, -50%); width: 40px; height: 40px; display: grid; place-items: center; background: #e9edf2; box-shadow: 0 0 0 3px #16121c, inset -4px -4px 0 #a9b4c2, inset 4px 4px 0 #ffffff; z-index: 6; pointer-events: none;">
+      <img src="sprites/spider.png" style="width: 22px; height: 22px; display: block;" alt="spider">
+    </div>
+  </sc-for>
+
+  <!-- FIXED HUD BORDER FRAME: wraps the scrollable map, never scrolls -->
+  <div style="background: #4a9fd8; padding: 4px; clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px); flex: 1; display: flex; flex-direction: column; min-height: 0; box-sizing: border-box;">
+  <div style="background: #0b1c3f; padding: 8px; clip-path: polygon(9px 0, calc(100% - 9px) 0, 100% 9px, 100% calc(100% - 9px), calc(100% - 9px) 100%, 9px 100%, 0 calc(100% - 9px), 0 9px); flex: 1; display: flex; flex-direction: column; min-height: 0; box-sizing: border-box;">
+  <div style="background: #1a4f82; padding: 3px; position: relative; flex: 1; display: flex; flex-direction: column; min-height: 0; box-sizing: border-box;">
+
+    <div style="position: relative; width: 100%; flex: 1 0 auto; min-height: 702px;">
+
+    <div ref="{{ scrollRef }}" style="width: 100%; height: 100%; overflow-x: auto; overflow-y: hidden;">
+    <div style="position: relative; width: 6000px; height: 100%; overflow: hidden; background: linear-gradient(180deg, #04081c 0%, #071130 34%, #0d1c45 62%, #16274f 84%, #223256 100%);">
+
+      <!-- STARS -->
+      <div style="position: absolute; inset: 0; pointer-events: none;">
+        <div style="position: absolute; left: 40px; top: 30px; width: 3px; height: 3px; background: #dbe9ff; box-shadow: {{ starsShadow }};"></div>
+        <div style="position: absolute; left: 5782px; top: 58px; width: 44px; height: 44px; border-radius: 50%; background: #e8f0ff; box-shadow: 0 0 40px 14px rgba(150, 190, 255, .22);"></div>
+        <div style="position: absolute; left: 5798px; top: 72px; width: 8px; height: 8px; background: #c9d8f2;"></div>
+        <div style="position: absolute; left: 5814px; top: 88px; width: 6px; height: 6px; background: #c9d8f2;"></div>
+      </div>
+
+      <!-- FAR SKYLINE -->
+      <div style="position: absolute; left: -10px; right: -10px; bottom: 0; height: 300px; display: flex; align-items: flex-end; gap: 7px; opacity: .85;">
+        <sc-for list="{{ farBuildings }}" as="b" hint-placeholder-count="60">
+          <div style="width: {{ b.w }}px; height: {{ b.h }}px; background: #0e1c44; flex: none;"></div>
+        </sc-for>
+      </div>
+
+      <!-- MID SKYLINE -->
+      <div style="position: absolute; left: -30px; right: -30px; bottom: 0; height: 260px; display: flex; align-items: flex-end; gap: 10px;">
+        <sc-for list="{{ midBuildings }}" as="b" hint-placeholder-count="56">
+          <div style="width: {{ b.w }}px; height: {{ b.h }}px; flex: none; background-color: #15275a; background-image: repeating-linear-gradient(180deg, transparent 0 4px, #15275a 4px 14px), repeating-linear-gradient(90deg, {{ b.window }} 0 4px, transparent 4px 14px); background-position: {{ b.bx }}px {{ b.by }}px; border-top: 3px solid #1d3474;"></div>
+        </sc-for>
+      </div>
+
+      <!-- STREET HAZE -->
+      <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 150px; background: linear-gradient(180deg, rgba(255, 176, 74, 0) 0%, rgba(255, 168, 74, .12) 55%, rgba(255, 190, 110, .28) 100%); pointer-events: none;"></div>
+
+      <!-- GOBLIN'S TOWER (LEFT) -->
+      <div style="position: absolute; left: 118px; bottom: 0; width: 196px; height: 544px; background-color: #1d3060; background-image: repeating-linear-gradient(180deg, transparent 0 7px, #1d3060 7px 24px), repeating-linear-gradient(90deg, rgba(242, 200, 90, .78) 0 7px, transparent 7px 24px); background-position: 14px 22px; box-shadow: inset -10px 0 0 rgba(6, 12, 32, .45), inset 10px 0 0 rgba(120, 175, 230, .08);">
+        <div style="position: absolute; left: -8px; top: -14px; width: 212px; height: 14px; background: #2c4784;"></div>
+        <div style="position: absolute; left: -8px; top: -18px; width: 212px; height: 4px; background: #4a9fd8;"></div>
+      </div>
+
+      <!-- SPIDEY'S TOWER (RIGHT) -->
+      <div style="position: absolute; left: 5700px; bottom: 0; width: 224px; height: 372px; background-color: #1b2c5a; background-image: repeating-linear-gradient(180deg, transparent 0 7px, #1b2c5a 7px 24px), repeating-linear-gradient(90deg, rgba(126, 190, 240, .6) 0 7px, transparent 7px 24px); background-position: 16px 26px; box-shadow: inset 10px 0 0 rgba(6, 12, 32, .4), inset -10px 0 0 rgba(120, 175, 230, .06);">
+        <div style="position: absolute; left: -18px; top: -26px; width: 260px; height: 26px; background: #24386e; box-shadow: inset 0 4px 0 #4a9fd8, inset 0 -3px 0 rgba(6, 12, 32, .5);"></div>
+        <div style="position: absolute; left: 174px; top: 74px; width: 40px; height: 17px; background: #26386a;"></div>
+        <div style="position: absolute; left: 40px; top: 170px; width: 22px; height: 17px; background: #26386a;"></div>
+        <div style="position: absolute; left: 132px; top: 268px; width: 40px; height: 17px; background: #26386a;"></div>
+        <div style="position: absolute; left: 20px; top: -46px; width: 12px; height: 32px; background: #2a4076;"></div>
+        <div style="position: absolute; left: 20px; top: -54px; width: 12px; height: 8px; background: #e8413a; animation: blink 1.4s steps(1, end) infinite;"></div>
+      </div>
+
+      <!-- RAZOR BATS IN FLIGHT -->
+      <sc-for list="{{ bats }}" as="bat" hint-placeholder-count="16">
+        <div style="position: absolute; left: {{ bat.left }}px; top: {{ bat.top }}px; transform: rotate({{ bat.rot }}deg);">
+          <img src="sprites/bat.png" style="width: {{ bat.w }}px; height: {{ bat.h }}px; display: block;" alt="razor bat">
+          <div style="position: absolute; right: {{ bat.streakRight }}px; top: {{ bat.streakTop }}px; width: {{ bat.streakW }}px; height: 4px; background: repeating-linear-gradient(90deg, rgba(174, 120, 235, .1) 0 8px, rgba(174, 120, 235, .55) 8px 16px);"></div>
+        </div>
+      </sc-for>
+
+      <!-- GREEN GOBLIN -->
+      <div style="position: absolute; left: 212px; bottom: 552px;">
+        <img src="sprites/goblin.png" style="width: 110px; height: 105px; display: block;" alt="Green Goblin on glider">
+        <div style="position: absolute; left: 6px; top: 112px; width: 98px; height: 10px; background: radial-gradient(ellipse at center, rgba(255, 149, 0, .5) 0%, rgba(255, 149, 0, 0) 70%);"></div>
+        <div style="position: absolute; left: -6px; top: -26px; display: flex; align-items: center; gap: 5px; padding: 4px 7px; background: #2b0f4d; box-shadow: 0 0 0 3px #7b2fbe;">
+          <span style="width: 7px; height: 7px; background: #4cc94c; display: block;"></span>
+          <span style="font-size: 11px; color: #d9b6ff; letter-spacing: .08em;">GOBLIN</span>
+        </div>
+      </div>
+
+      <!-- MJ FALLING -->
+      <div style="position: absolute; left: 248px; top: 366px; transform: rotate(-18deg);">
+        <img src="sprites/mj-falling.png" style="width: 94px; height: 129px; display: block; image-rendering: pixelated;" alt="MJ falling">
+      </div>
+      <!-- MJ RETICLE -->
+      <div style="position: absolute; left: 228px; top: 352px; width: 136px; height: 160px; pointer-events: none;">
+        <div style="position: absolute; left: 0; top: 0; width: 22px; height: 5px; background: #e8413a;"></div>
+        <div style="position: absolute; left: 0; top: 0; width: 5px; height: 22px; background: #e8413a;"></div>
+        <div style="position: absolute; right: 0; top: 0; width: 22px; height: 5px; background: #e8413a;"></div>
+        <div style="position: absolute; right: 0; top: 0; width: 5px; height: 22px; background: #e8413a;"></div>
+        <div style="position: absolute; left: 0; bottom: 0; width: 22px; height: 5px; background: #e8413a;"></div>
+        <div style="position: absolute; left: 0; bottom: 0; width: 5px; height: 22px; background: #e8413a;"></div>
+        <div style="position: absolute; right: 0; bottom: 0; width: 22px; height: 5px; background: #e8413a;"></div>
+        <div style="position: absolute; right: 0; bottom: 0; width: 5px; height: 22px; background: #e8413a;"></div>
+        <div style="position: absolute; left: 50%; top: -30px; transform: translateX(-50%); display: flex; align-items: center; gap: 6px; padding: 4px 8px; background: #4a0f10; box-shadow: 0 0 0 3px #e8413a;">
+          <span style="font-size: 11px; color: #ffd7d5; letter-spacing: .1em;">MJ</span>
+          <span style="font-size: 11px; color: #ff8d86; letter-spacing: .06em;">FALLING</span>
+        </div>
+        <div style="position: absolute; left: 50%; bottom: -32px; transform: translateX(-50%); padding: 4px 8px; background: rgba(20, 8, 26, .92); box-shadow: 0 0 0 2px #7a1f1f; font-size: 11px; color: #ffb3ae; letter-spacing: .08em; white-space: nowrap;">{{ distanceLabel }}</div>
+      </div>
+
+      <!-- SPIDER-MAN -->
+      <div style="position: absolute; left: 5781px; bottom: 394px;">
+        <img src="sprites/spidey-v2.png" style="width: 70px; height: 130px; display: block; image-rendering: pixelated;" alt="Spider-Man">
+        <div style="position: absolute; left: -16px; top: 122px; width: 102px; height: 12px; background: radial-gradient(ellipse at center, rgba(6, 12, 32, .6) 0%, rgba(6, 12, 32, 0) 70%);"></div>
+        <div style="position: absolute; left: 74px; top: -8px; display: flex; align-items: center; gap: 5px; padding: 4px 7px; background: #3a0c0c; box-shadow: 0 0 0 3px #e8413a;">
+          <img src="sprites/spider.png" style="width: 11px; height: 11px; display: block; filter: invert(1);" alt="">
+          <span style="font-size: 11px; color: #ffd7d5; letter-spacing: .08em;">YOU</span>
+        </div>
+      </div>
+
+      <!-- SCANLINES + VIGNETTE -->
+      <div style="position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(180deg, rgba(0, 0, 0, .16) 0 2px, rgba(0, 0, 0, 0) 2px 4px); mix-blend-mode: multiply;"></div>
+      <div style="position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 120px 30px rgba(3, 7, 20, .65);"></div>
+
+    </div>
+    </div>
+
+    <!-- HUD OVERLAY: fixed border chrome — does not scroll with the map -->
+    <div style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; z-index: 5; pointer-events: none; font-family: 'Silkscreen', monospace;">
+<!-- ======== HUD ======== -->
+
+      <!-- TOP LEFT: LIVES + SCORE -->
+      <div style="position: absolute; left: 16px; top: 14px; display: flex; flex-direction: column; gap: 9px;">
+        <div style="display: flex; align-items: center; gap: 7px;">
+          <sc-for list="{{ lifeSlots }}" as="slot" hint-placeholder-count="3">
+            <div style="width: 34px; height: 34px; display: grid; place-items: center; background: {{ slot.bg }}; box-shadow: 0 0 0 3px #f4f4f4, 0 0 0 6px #16121c;">
+              <img src="sprites/spider.png" style="width: 18px; height: 18px; display: block; opacity: {{ slot.op }};" alt="life">
+            </div>
+          </sc-for>
+        </div>
+        <div style="background: #4a9fd8; padding: 3px; clip-path: polygon(5px 0, calc(100% - 5px) 0, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 0 calc(100% - 5px), 0 5px);">
+          <div style="background: #071129; padding: 7px 12px; display: flex; align-items: baseline; gap: 10px; clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);">
+            <span style="font-size: 11px; color: #7fc4e8; letter-spacing: .12em;">SCORE</span>
+            <span style="font-family: 'Press Start 2P', monospace; font-size: 15px; color: #f2a93b;">{{ score }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOP CENTER: TITLE PLAQUE -->
+      <div style="position: absolute; left: 50%; top: 12px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px;">
+        <div style="position: relative; background: #4a9fd8; padding: 4px; clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px);">
+          <div style="background: #040a1e; padding: 12px 34px; display: flex; align-items: center; gap: 16px; clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);">
+            <span style="font-family: 'Press Start 2P', monospace; font-size: 19px; color: #cfe7fa; letter-spacing: .04em; text-shadow: 0 3px 0 #14345e;">SPIDEY</span>
+            <span style="width: 36px; height: 36px; display: grid; place-items: center; background: #e8413a; border-radius: 50%; box-shadow: 0 0 0 3px #16121c;">
+              <img src="sprites/spider.png" style="width: 22px; height: 22px; display: block;" alt="">
+            </span>
+            <span style="font-family: 'Press Start 2P', monospace; font-size: 19px; color: #cfe7fa; letter-spacing: .04em; text-shadow: 0 3px 0 #14345e;">WARS</span>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px; padding: 5px 12px; background: rgba(4, 10, 30, .82); box-shadow: 0 0 0 3px #1a4f82;">
+          <span style="font-size: 11px; color: #f2a93b; letter-spacing: .12em;">EP.1</span>
+          <span style="font-size: 11px; color: #cfe7fa; letter-spacing: .12em;">GOBLIN TOOK MY GIRL</span>
+        </div>
+      </div>
+
+      <!-- TOP RIGHT: SYSTEM BUTTONS + WEB FLUID -->
+      <div style="position: absolute; right: 16px; top: 14px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
+        <div style="background: #4a9fd8; padding: 3px; clip-path: polygon(5px 0, calc(100% - 5px) 0, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 0 calc(100% - 5px), 0 5px);">
+          <div style="background: #071129; padding: 9px 12px; display: flex; flex-direction: column; gap: 7px; clip-path: polygon(4px 0, calc(100% - 4px) 0, 100% 4px, 100% calc(100% - 4px), calc(100% - 4px) 100%, 4px 100%, 0 calc(100% - 4px), 0 4px);">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 18px;">
+              <span style="font-size: 11px; color: #7fc4e8; letter-spacing: .12em;">WEB FLUID</span>
+              <span style="font-size: 11px; color: #cfe7fa; letter-spacing: .08em;">{{ webLabel }}</span>
+            </div>
+            <div style="width: 194px; height: 16px; background: #0d1b3c; box-shadow: inset 0 0 0 2px #1a4f82; display: flex; padding: 3px; gap: 3px;">
+              <sc-for list="{{ webCells }}" as="cell" hint-placeholder-count="12">
+                <div style="flex: 1; background: {{ cell.bg }};"></div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEFT EDGE: ABILITY CHIPS -->
+      <div style="position: absolute; left: 16px; top: 134px; display: flex; flex-direction: column; gap: 11px;">
+        <div style="display: flex; align-items: center; gap: 9px;">
+          <div style="width: 48px; height: 48px; display: grid; place-items: center; background: #e9edf2; box-shadow: 0 0 0 3px #16121c, inset -4px -4px 0 #a9b4c2, inset 4px 4px 0 #ffffff;">
+            <span style="font-family: 'Press Start 2P', monospace; font-size: 15px; color: #16121c;">W</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 11px; color: #cfe7fa; letter-spacing: .1em;">WEB-ZIP</span>
+            <span style="font-size: 11px; color: #4cc94c; letter-spacing: .08em;">READY</span>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 9px;">
+          <div style="position: relative; width: 48px; height: 48px; display: grid; place-items: center; background: #93a1b2; box-shadow: 0 0 0 3px #16121c, inset -4px -4px 0 #71808f, inset 4px 4px 0 #c2ccd8; overflow: hidden;">
+            <span style="font-family: 'Press Start 2P', monospace; font-size: 15px; color: #16121c;">S</span>
+            <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 40%; background: rgba(9, 18, 40, .62);"></div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 11px; color: #cfe7fa; letter-spacing: .1em;">WEB-SLING</span>
+            <span style="font-size: 11px; color: #f2a93b; letter-spacing: .08em;">1.2s</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM LEFT: IMPACT TIMER -->
+      <div style="position: absolute; left: 16px; bottom: 74px; background: #e8413a; padding: 3px; clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);">
+        <div style="background: #14081a; padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; clip-path: polygon(5px 0, calc(100% - 5px) 0, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 0 calc(100% - 5px), 0 5px);">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="width: 9px; height: 9px; background: #e8413a; display: block; animation: blink 0.7s steps(1, end) infinite;"></span>
+            <span style="font-size: 11px; color: #ff8d86; letter-spacing: .12em;">IMPACT IN</span>
+            <span style="font-family: 'Press Start 2P', monospace; font-size: 16px; color: #ffd7d5;">{{ impactLabel }}</span>
+          </div>
+          <div style="width: 262px; height: 18px; background: #2a0f14; box-shadow: inset 0 0 0 2px #7a1f1f;">
+            <div style="height: 100%; background: repeating-linear-gradient(90deg, #e8413a 0 9px, #b52a26 9px 14px); width: {{ impactBarWidth }};"></div>
+          </div>
+          <span style="font-size: 11px; color: #b5657f; letter-spacing: .08em;">MJ IS 42 FLOORS FROM THE STREET</span>
+        </div>
+      </div>
+
+      <!-- BOTTOM RIGHT: SPIDER-SENSE RADAR -->
+      <div style="position: absolute; right: 22px; bottom: 92px; width: 168px; padding: 10px 10px 8px; background: rgba(4, 10, 30, .7); box-shadow: 0 0 0 3px #1a4f82;">
+        <div style="position: relative; width: 148px; height: 118px; margin: 0 auto;">
+          <div style="position: absolute; left: 24px; top: 9px; width: 100px; height: 100px; border-radius: 50%; border: 3px solid rgba(122, 190, 240, .45);"></div>
+          <div style="position: absolute; left: 42px; top: 27px; width: 64px; height: 64px; border-radius: 50%; border: 3px solid rgba(122, 190, 240, .3);"></div>
+          <div style="position: absolute; left: 58px; top: 43px; width: 32px; height: 32px; border-radius: 50%; border: 3px solid rgba(122, 190, 240, .22);"></div>
+          <div style="position: absolute; left: 73px; top: 0; bottom: 0; width: 2px; background: rgba(122, 190, 240, .25);"></div>
+          <div style="position: absolute; top: 58px; left: 16px; right: 16px; height: 2px; background: rgba(122, 190, 240, .25);"></div>
+          <div style="position: absolute; left: 70px; top: 55px; width: 9px; height: 9px; background: #cfe7fa;"></div>
+          <div style="position: absolute; left: 40px; top: 76px; width: 9px; height: 9px; background: #e8413a;"></div>
+          <div style="position: absolute; left: 56px; top: 32px; width: 9px; height: 9px; background: #7b2fbe;"></div>
+          <div style="position: absolute; left: 100px; top: 64px; width: 9px; height: 9px; background: #4cc94c;"></div>
+        </div>
+        <div style="text-align: center; font-size: 11px; color: #7fc4e8; letter-spacing: .14em;">SPIDER-SENSE</div>
+      </div>
+
+      <!-- BOTTOM: INPUT TICKER -->
+      <div style="position: absolute; left: 0; right: 0; bottom: 12px; display: flex; justify-content: center; align-items: center; gap: 12px;">
+        <div style="background: #4a9fd8; padding: 3px; clip-path: polygon(7px 0, calc(100% - 7px) 0, 100% 7px, 100% calc(100% - 7px), calc(100% - 7px) 100%, 7px 100%, 0 calc(100% - 7px), 0 7px);">
+          <div style="background: #12213f; padding: 11px 26px; display: flex; align-items: center; gap: 22px; clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);">
+            <span style="font-size: 13px; color: #f2a93b; letter-spacing: .1em;">◼ AIM — MOUSE + CLICK TO SHOOT</span>
+            <span style="font-size: 13px; color: #9ed8f5; letter-spacing: .1em;">◼ HOLD SPACE TO SWING</span>
+            <span style="font-size: 13px; color: #cfe7fa; letter-spacing: .1em;">◼ PRESS X TO JUMP</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TUTORIAL ANNOTATIONS -->
+      <sc-if value="{{ showLabels }}" hint-placeholder-val="{{ false }}">
+        <div style="position: absolute; inset: 0; pointer-events: none;">
+          <div style="position: absolute; left: 138px; top: 26px; font-size: 12px; color: #7fc4e8; letter-spacing: .1em;">LIVES ╲</div>
+          <div style="position: absolute; left: 178px; top: 96px; font-size: 12px; color: #7fc4e8; letter-spacing: .1em;">SCORE ╲</div>
+          <div style="position: absolute; left: 200px; top: 156px; font-size: 12px; color: #7fc4e8; letter-spacing: .1em;">ABILITIES ╲</div>
+          <div style="position: absolute; right: 244px; top: 118px; font-size: 12px; color: #7fc4e8; letter-spacing: .1em;">╱ WEB METER</div>
+          <div style="position: absolute; left: 300px; bottom: 152px; font-size: 12px; color: #ff8d86; letter-spacing: .1em;">╱ RESCUE TIMER</div>
+          <div style="position: absolute; right: 202px; bottom: 250px; font-size: 12px; color: #7fc4e8; letter-spacing: .1em;">THREAT RADAR ╲</div>
+          <div style="position: absolute; left: 50%; top: 300px; transform: translateX(-50%); text-align: center; font-family: 'Press Start 2P', monospace; font-size: 15px; color: #f2a93b; line-height: 2; text-shadow: 0 3px 0 #2a1200;">SWING LEFT. CATCH MJ.<br>DON'T EAT A RAZOR BAT.</div>
+        </div>
+      </sc-if>
+
+    </div>
+
+    </div>
+
+  </div>
+  </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;lives&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:2,&quot;min&quot;:0,&quot;max&quot;:3,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Game state&quot;},&quot;score&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;004250&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Game state&quot;},&quot;impactSeconds&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:8.4,&quot;min&quot;:0,&quot;max&quot;:15,&quot;step&quot;:0.1,&quot;unit&quot;:&quot;s&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Game state&quot;},&quot;webFluid&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:64,&quot;min&quot;:0,&quot;max&quot;:100,&quot;step&quot;:1,&quot;unit&quot;:&quot;%&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Game state&quot;},&quot;showTutorialLabels&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Presentation&quot;}}">
+class Component extends DCLogic {
+  scrollRef = React.createRef();
+  seedRand(seed) {
+    let a = seed;
+    return () => {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  renderVals() {
+    const rand = this.seedRand(20260912);
+    const farBuildings = Array.from({ length: 60 }, () => ({
+      w: Math.round(44 + rand() * 70),
+      h: Math.round(112 + rand() * 170)
+    }));
+    const windowTints = ['rgba(126, 190, 240, .5)', 'rgba(126, 190, 240, .42)', 'rgba(242, 200, 90, .32)'];
+    const midBuildings = Array.from({ length: 56 }, () => ({
+      w: Math.round(56 + rand() * 84),
+      h: Math.round(108 + rand() * 140),
+      window: windowTints[Math.floor(rand() * windowTints.length)],
+      bx: Math.round(6 + rand() * 8),
+      by: Math.round(10 + rand() * 4)
+    }));
+    const starPts = [];
+    for (let i = 0; i < 60; i++) {
+      const x = Math.round(rand() * 5990);
+      const y = Math.round(rand() * 260);
+      const c = rand() > 0.5 ? '#fff' : (rand() > 0.5 ? '#9fc4ff' : '#7fa8e8');
+      starPts.push(x + 'px ' + y + 'px ' + c);
+    }
+    const bats = Array.from({ length: 16 }, (_, i) => {
+      const big = rand() > 0.4;
+      const w = big ? 66 : 54, h = big ? 42 : 34;
+      return {
+        left: Math.round(400 + i * 355 + rand() * 120),
+        top: Math.round(190 + rand() * 90),
+        rot: Math.round(-18 + rand() * 36),
+        w, h,
+        streakRight: Math.round(w - 4),
+        streakTop: Math.round(h * 0.4),
+        streakW: Math.round(70 + rand() * 30)
+      };
+    }).filter(b => b.left < 5550 || b.left > 6000);
+    const lives = Math.max(0, Math.min(3, this.props.lives ?? 2));
+    const web = Math.max(0, Math.min(100, this.props.webFluid ?? 64));
+    const secs = this.props.impactSeconds ?? 8.4;
+    const cells = 12;
+    const lit = Math.round((web / 100) * cells);
+    return {
+      scrollRef: this.scrollRef,
+      farBuildings,
+      midBuildings,
+      starsShadow: starPts.join(', '),
+      bats,
+      score: this.props.score ?? '004250',
+      showLabels: !!this.props.showTutorialLabels,
+      lifeSlots: [0, 1, 2].map(i => ({
+        bg: i < lives ? '#e8413a' : '#3d4658',
+        op: i < lives ? 1 : 0.35
+      })),
+      webCells: Array.from({ length: cells }, (_, i) => ({
+        bg: i < lit ? (i < 3 ? '#e8413a' : '#7fc4e8') : '#16294d'
+      })),
+      webLabel: Math.round(web) + '%',
+      impactLabel: secs.toFixed(1) + 's',
+      impactBarWidth: Math.max(0, Math.min(100, (secs / 15) * 100)) + '%',
+      distanceLabel: '▼ 186 ft — CATCH HER'
+    };
+  }
+}
+</script>
+</body>
+</html>

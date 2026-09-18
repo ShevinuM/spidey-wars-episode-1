@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet" />
+<style>
+  html, body { height: 100%; margin: 0; background: #060d22; }
+  a { color: #f2a93b; text-decoration: none; }
+  a:hover { color: #ffd27a; }
+  img { image-rendering: pixelated; -webkit-user-drag: none; }
+  @keyframes blink { 0%, 60% { opacity: 1 } 61%, 100% { opacity: .25 } }
+  @keyframes stream { 0%, 100% { opacity: 1 } 50% { opacity: .55 } }
+  @keyframes shiver { 0%, 100% { transform: translateX(0) } 50% { transform: translateX(2px) } }
+</style>
+</helmet>
+<div style="width: 100%; height: 100%; position: relative; font-family: 'Silkscreen', monospace; display: flex; flex-direction: column; box-sizing: border-box;">
+
+  <div style="background: #4a9fd8; padding: 4px; clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px); flex: 1; display: flex; flex-direction: column; min-height: 0; box-sizing: border-box;">
+  <div style="background: #0b1c3f; padding: 8px; clip-path: polygon(9px 0, calc(100% - 9px) 0, 100% 9px, 100% calc(100% - 9px), calc(100% - 9px) 100%, 9px 100%, 0 calc(100% - 9px), 0 9px); flex: 1; display: flex; flex-direction: column; min-height: 0; box-sizing: border-box;">
+  <div style="background: #1a4f82; padding: 3px; position: relative; flex: 1; display: flex; flex-direction: column; min-height: 0; box-sizing: border-box;">
+
+    <div style="position: relative; width: 100%; flex: 1 0 auto; min-height: 702px; overflow: hidden; background: linear-gradient(180deg, #04081c 0%, #071130 30%, #0d1c45 58%, #16274f 82%, #223256 100%);">
+
+      <!-- STARS + MOON -->
+      <div style="position: absolute; inset: 0; pointer-events: none;">
+        <div style="position: absolute; left: 40px; top: 26px; width: 3px; height: 3px; background: #dbe9ff; box-shadow: {{ starsShadow }};"></div>
+        <div style="position: absolute; right: 84px; top: 52px; width: 52px; height: 52px; border-radius: 50%; background: #e8f0ff; box-shadow: 0 0 54px 18px rgba(150, 190, 255, .2);"></div>
+        <div style="position: absolute; right: 112px; top: 66px; width: 9px; height: 9px; background: #c9d8f2;"></div>
+      </div>
+
+      <!-- STAGE -->
+      <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 1080px; zoom: 0.82; transform: translateX(-50%); transform-origin: 50% 100%;">
+
+        <!-- FAR SKYLINE (extends to ground so the rooftop reads as high above a real city) -->
+        <div style="position: absolute; left: -80px; right: -80px; bottom: 0; height: 382px; display: flex; align-items: flex-end; gap: 8px; opacity: .75;">
+          <sc-for list="{{ farBuildings }}" as="b" hint-placeholder-count="24">
+            <div style="width: {{ b.w }}px; height: {{ b.h }}px; background: #0e1c44; flex: none;"></div>
+          </sc-for>
+        </div>
+
+        <!-- MID SKYLINE (extends to ground) -->
+        <div style="position: absolute; left: -120px; right: -120px; bottom: 0; height: 352px; display: flex; align-items: flex-end; gap: 14px;">
+          <sc-for list="{{ midBuildings }}" as="b" hint-placeholder-count="18">
+            <div style="width: {{ b.w }}px; height: {{ b.h }}px; flex: none; background-color: #15275a; background-image: repeating-linear-gradient(180deg, transparent 0 4px, #15275a 4px 14px), repeating-linear-gradient(90deg, {{ b.window }} 0 4px, transparent 4px 14px); background-position: {{ b.bx }}px {{ b.by }}px; border-top: 3px solid #1d3474;"></div>
+          </sc-for>
+        </div>
+
+        <!-- STREET HAZE (extends to ground) -->
+        <div style="position: absolute; left: -120px; right: -120px; bottom: 0; height: 292px; background: linear-gradient(180deg, rgba(255, 176, 74, 0) 0%, rgba(255, 168, 74, .1) 55%, rgba(255, 190, 110, .26) 100%); pointer-events: none;"></div>
+
+        <!-- WATER TOWER (far left, on the roof) -->
+        <div style="position: absolute; left: 36px; bottom: 290px; width: 96px; height: 96px; background: #1c2d5c; box-shadow: inset 0 6px 0 #2f4c8c, inset -8px 0 0 rgba(6, 12, 32, .45);"></div>
+        <div style="position: absolute; left: 24px; bottom: 386px; width: 120px; height: 20px; background: #263c72;"></div>
+        <div style="position: absolute; left: 54px; bottom: 250px; width: 10px; height: 44px; background: #1b2a55;"></div>
+        <div style="position: absolute; left: 104px; bottom: 250px; width: 10px; height: 44px; background: #1b2a55;"></div>
+
+        <!-- ANTENNA -->
+        <div style="position: absolute; left: 222px; bottom: 250px; width: 9px; height: 200px; background: #2a4076;"></div>
+        <div style="position: absolute; left: 216px; bottom: 450px; width: 20px; height: 10px; background: #e8413a; animation: blink 1.4s steps(1, end) infinite;"></div>
+        <div style="position: absolute; left: 206px; bottom: 380px; width: 40px; height: 6px; background: #2a4076;"></div>
+
+        <!-- AC UNIT -->
+        <div style="position: absolute; left: 318px; bottom: 250px; width: 104px; height: 62px; background: #22366b; box-shadow: inset 0 5px 0 #3a5c9e, inset -8px 0 0 rgba(6, 12, 32, .4);"></div>
+        <div style="position: absolute; left: 334px; bottom: 312px; width: 34px; height: 14px; background: #2c4784;"></div>
+
+        <!-- ROOF SLAB: top face + parapet coping, edge at x = 820 -->
+        <div style="position: absolute; left: -240px; width: 1060px; bottom: 0; height: 250px;">
+          <div style="position: absolute; left: 0; right: 0; top: 0; height: 30px; background: #33508f; box-shadow: inset 0 4px 0 #5d8fd6, inset 0 -5px 0 rgba(6, 12, 32, .5);"></div>
+          <div style="position: absolute; left: 0; right: 0; top: 30px; bottom: 0; background-color: #16244a; background-image: repeating-linear-gradient(90deg, rgba(255, 255, 255, .035) 0 3px, transparent 3px 22px), repeating-linear-gradient(180deg, rgba(0, 0, 0, .3) 0 2px, transparent 2px 26px);"></div>
+          <div style="position: absolute; right: 0; top: 0; width: 22px; bottom: 0; background: #0c1630;"></div>
+          <div style="position: absolute; right: 22px; top: 30px; width: 10px; bottom: 0; background: rgba(120, 175, 230, .1);"></div>
+        </div>
+
+        <!-- SPIDEY + STREAM -->
+        <div style="position: absolute; left: 556px; bottom: 250px; width: 208px; height: 400px;">
+          <img src="sprites/spidey-side-new.png" style="position: absolute; left: 0; top: 0; width: 208px; height: 400px; display: block; animation: shiver 3.4s steps(2, end) infinite;" alt="Spider-Man in close-up, standing at the edge of a rooftop with one hand at his waist" />
+          <div style="position: absolute; left: -8px; top: 394px; width: 224px; height: 16px; background: radial-gradient(ellipse at center, rgba(6, 12, 32, .7) 0%, rgba(6, 12, 32, 0) 70%);"></div>
+
+          <!-- NAME TAG -->
+          <div style="position: absolute; left: 34px; top: -30px; display: flex; align-items: center; gap: 6px; padding: 4px 8px; background: #0f1c3c; box-shadow: 0 0 0 3px #4a9fd8;">
+            <span style="width: 7px; height: 7px; background: #e8413a; display: block;"></span>
+            <span style="font-size: 11px; color: #9ed8f5; letter-spacing: .1em;">SPIDEY</span>
+          </div>
+        </div>
+
+        <!-- THE ARC: leaves the crotch heading outward past the roof ledge, then falls all the way past the bottom of frame -->
+        <sc-if value="{{ streamOn }}" hint-placeholder-val="{{ true }}">
+          <sc-for list="{{ stream }}" as="d" hint-placeholder-count="42">
+            <div style="position: absolute; left: {{ d.x }}px; bottom: {{ d.b }}px; width: {{ d.s }}px; height: {{ d.s }}px; background: #f6fbff; opacity: {{ d.o }}; box-shadow: 0 0 10px 2px rgba(210, 240, 255, .3); animation: stream 0.5s steps(2, end) infinite; animation-delay: {{ d.delay }}s;"></div>
+          </sc-for>
+        </sc-if>
+
+      </div>
+
+      <!-- COMIC DIALOG BALLOON: SPIDEY (internal monologue) -->
+      <div style="position: absolute; left: max(26px, calc(50% - 470px)); top: 150px; width: min(454px, calc(100% - 52px)); z-index: 6;">
+        <div style="position: relative; background: #f4f1e6; padding: 5px; box-shadow: 0 0 0 4px #16121c, 10px 12px 0 rgba(4, 10, 30, .55);">
+          <div style="border: 3px solid #4a9fd8; padding: 17px 18px 19px; display: flex; flex-direction: column; gap: 13px;">
+            <p style="margin: 0; font-size: 13px; line-height: 1.95; color: #16121c; letter-spacing: .02em; text-wrap: pretty;"><span style="font-family: 'Press Start 2P', monospace; font-size: 12px; color: #1a4f82; line-height: 2.2;">OKAY.</span> Nobody's looking. Nobody's <em style="font-style: normal; font-weight: 700;">ever</em> looking. Eight million people in this city and not one of them looks <span style="font-weight: 700; color: #c2241d;">UP</span>, which is great for me and terrible for my self-esteem.</p>
+            <p style="margin: 0; font-size: 13px; line-height: 1.95; color: #16121c; letter-spacing: .02em; text-wrap: pretty;">Perks of the job, right? Best view in New York. Worst bathroom in New York.</p>
+            <p style="margin: 0; font-size: 13px; line-height: 1.95; color: #4a3f2e; letter-spacing: .02em; text-wrap: pretty;">...If this ends up on the Bugle, Jonah gets a <span style="color: #16121c; font-weight: 700;">Pulitzer</span>.</p>
+          </div>
+          <!-- balloon tail -->
+          <div style="position: absolute; right: -14px; top: 46%; width: 28px; height: 28px; background: #f4f1e6; transform: rotate(45deg); box-shadow: 5px -5px 0 0 #16121c;"></div>
+        </div>
+      </div>
+
+      <!-- PRESS SPACE PLAQUE -->
+      <sc-if value="{{ letterbox }}" hint-placeholder-val="{{ true }}">
+        <div style="position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); pointer-events: none; z-index: 7;">
+          <div style="background: #4a9fd8; padding: 3px; clip-path: polygon(7px 0, calc(100% - 7px) 0, 100% 7px, 100% calc(100% - 7px), calc(100% - 7px) 100%, 7px 100%, 0 calc(100% - 7px), 0 7px);">
+            <div style="background: #12213f; padding: 11px 26px; display: flex; align-items: center; gap: 14px; clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);">
+              <span style="font-size: 13px; color: #9ed8f5; letter-spacing: .12em; animation: blink 0.9s steps(1, end) infinite;">◼ PRESS SPACE TO CONTINUE</span>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- SCANLINES + VIGNETTE -->
+      <div style="position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(180deg, rgba(0, 0, 0, .16) 0 2px, rgba(0, 0, 0, 0) 2px 4px); mix-blend-mode: multiply;"></div>
+      <div style="position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 130px 34px rgba(3, 7, 20, .68);"></div>
+
+    </div>
+
+  </div>
+  </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showStream&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Scene&quot;},&quot;streamReach&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:1,&quot;min&quot;:0.6,&quot;max&quot;:1.6,&quot;step&quot;:0.05,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Scene&quot;},&quot;showLetterbox&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Presentation&quot;}}">
+class Component extends DCLogic {
+  seedRand(seed) {
+    let a = seed;
+    return () => {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  renderVals() {
+    const rand = this.seedRand(50218);
+    const farBuildings = Array.from({ length: 24 }, () => ({
+      w: Math.round(50 + rand() * 78),
+      h: Math.round(80 + rand() * 140) + 142
+    }));
+    const windowTints = ['rgba(126, 190, 240, .5)', 'rgba(126, 190, 240, .42)', 'rgba(242, 200, 90, .32)'];
+    const midBuildings = Array.from({ length: 18 }, () => ({
+      w: Math.round(66 + rand() * 92),
+      h: Math.round(86 + rand() * 112) + 142,
+      window: windowTints[Math.floor(rand() * windowTints.length)],
+      bx: Math.round(6 + rand() * 8),
+      by: Math.round(10 + rand() * 4)
+    }));
+    const starPts = [];
+    for (let i = 0; i < 44; i++) {
+      const x = Math.round(rand() * 1500);
+      const y = Math.round(rand() * 260);
+      const c = rand() > 0.5 ? '#fff' : (rand() > 0.5 ? '#9fc4ff' : '#7fa8e8');
+      starPts.push(x + 'px ' + y + 'px ' + c);
+    }
+
+    // Pixel arc of the stream, in STAGE-local coordinates (roof ledge at x=820).
+    // Leaves the crotch heading outward past the ledge, then gravity pulls it
+    // down all the way past the bottom of the frame.
+    const reach = this.props.streamReach ?? 1;
+    const steps = 44;
+    const startX = 668, startBottom = 394, endBottom = -40;
+    const endX = startX + 470 * reach;
+    const stream = [];
+    for (let i = 0; i < steps; i++) {
+      const t = i / (steps - 1);
+      const s = i < 6 ? 6 : (i < 22 ? 7 : 8);
+      const xt = 1 - (1 - t) * (1 - t);
+      const bt = t * t;
+      stream.push({
+        x: Math.round(startX + (endX - startX) * xt),
+        b: Math.round(startBottom - (startBottom - endBottom) * bt),
+        s,
+        o: 1,
+        delay: Number((i * 0.05).toFixed(2))
+      });
+    }
+
+    return {
+      farBuildings,
+      midBuildings,
+      starsShadow: starPts.join(', '),
+      stream,
+      streamOn: this.props.showStream ?? true,
+      letterbox: this.props.showLetterbox ?? true
+    };
+  }
+}
+</script>
+</body>
+</html>

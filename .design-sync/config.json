@@ -1,0 +1,14 @@
+{
+  "source": {
+    "projectId": "308db699-a968-473b-9bef-66810a3fcf1b",
+    "projectName": "Spidey Wars",
+    "shape": "reference",
+    "note": "Regular Claude Design project holding the mockups (*.dc.html + support.js) and sprites. Read-only: DesignSync get_file only, run from the main session (DesignSync is not available to subagents). Local copies: reference/design/ and assets/sprites/."
+  },
+  "mirror": {
+    "projectId": "6737eb90-31a3-483b-9846-d77090152af2",
+    "projectName": "Spidey Wars mirror",
+    "shape": "scene-mirror",
+    "note": "Design-system project created 2026-09-18. Receives one .dc.html per rendered Phaser scene state from scripts/generate-design-mirror.ts (ds-bundle/pages/**). Pushed by the developer with DesignSync finalize_plan (localDir ds-bundle, writes pages/**, deletes []) + write_files; never by CI."
+  }
+}

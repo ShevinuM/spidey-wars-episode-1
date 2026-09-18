@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet" />
+<style>
+  html, body { height: 100%; margin: 0; background: #060d22; }
+  a { color: #f2a93b; text-decoration: none; }
+  a:hover { color: #ffd27a; }
+  img { image-rendering: pixelated; -webkit-user-drag: none; }
+  @keyframes blink { 0%, 60% { opacity: 1 } 61%, 100% { opacity: .25 } }
+  @keyframes zap { 0%, 40% { opacity: 1; transform: translateX(0) } 41%, 100% { opacity: 0; transform: translateX(-3px) } }
+  @keyframes senseRing { 0% { opacity: .55; transform: scale(.7) } 70% { opacity: 0; transform: scale(1.5) } 100% { opacity: 0; transform: scale(1.5) } }
+  @keyframes jolt { 0%, 100% { transform: translate(0, 0) } 25% { transform: translate(-3px, 1px) } 50% { transform: translate(2px, -2px) } 75% { transform: translate(-1px, -1px) } }
+  @keyframes screamPulse { 0%, 100% { transform: scale(1) } 50% { transform: scale(1.06) } }
+</style>
+</helmet>
+<div style="width: 100%; height: 100%; position: relative; font-family: 'Silkscreen', monospace; display: flex; flex-direction: column; box-sizing: border-box;">
+
+  <div style="background: #4a9fd8; padding: 4px; clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px); flex: 1; display: flex; flex-direction: column; min-height: 0; box-sizing: border-box;">
+  <div style="background: #0b1c3f; padding: 8px; clip-path: polygon(9px 0, calc(100% - 9px) 0, 100% 9px, 100% calc(100% - 9px), calc(100% - 9px) 100%, 9px 100%, 0 calc(100% - 9px), 0 9px); flex: 1; display: flex; flex-direction: column; min-height: 0; box-sizing: border-box;">
+  <div style="background: #1a4f82; padding: 3px; position: relative; flex: 1; display: flex; flex-direction: column; min-height: 0; box-sizing: border-box;">
+
+    <div style="position: relative; width: 100%; flex: 1 0 auto; min-height: 702px; overflow: hidden; background: linear-gradient(180deg, #04081c 0%, #071130 30%, #0d1c45 58%, #16274f 82%, #223256 100%);">
+
+      <!-- STARS + MOON -->
+      <div style="position: absolute; inset: 0; pointer-events: none;">
+        <div style="position: absolute; left: 40px; top: 26px; width: 3px; height: 3px; background: #dbe9ff; box-shadow: {{ starsShadow }};"></div>
+        <div style="position: absolute; right: 84px; top: 52px; width: 52px; height: 52px; border-radius: 50%; background: #e8f0ff; box-shadow: 0 0 54px 18px rgba(150, 190, 255, .2);"></div>
+        <div style="position: absolute; right: 112px; top: 66px; width: 9px; height: 9px; background: #c9d8f2;"></div>
+      </div>
+
+      <!-- STAGE -->
+      <div style="position: absolute; left: calc(50% - 150px); top: 0; bottom: 0; width: 1080px; zoom: 0.82; transform: translateX(-50%); transform-origin: 50% 100%;">
+
+        <!-- FAR SKYLINE (extends to ground so the rooftop reads as high above a real city) -->
+        <div style="position: absolute; left: -80px; right: -80px; bottom: 0; height: 382px; display: flex; align-items: flex-end; gap: 8px; opacity: .75;">
+          <sc-for list="{{ farBuildings }}" as="b" hint-placeholder-count="24">
+            <div style="width: {{ b.w }}px; height: {{ b.h }}px; background: #0e1c44; flex: none;"></div>
+          </sc-for>
+        </div>
+
+        <!-- MID SKYLINE (extends to ground) -->
+        <div style="position: absolute; left: -120px; right: -120px; bottom: 0; height: 352px; display: flex; align-items: flex-end; gap: 14px;">
+          <sc-for list="{{ midBuildings }}" as="b" hint-placeholder-count="18">
+            <div style="width: {{ b.w }}px; height: {{ b.h }}px; flex: none; background-color: #15275a; background-image: repeating-linear-gradient(180deg, transparent 0 4px, #15275a 4px 14px), repeating-linear-gradient(90deg, {{ b.window }} 0 4px, transparent 4px 14px); background-position: {{ b.bx }}px {{ b.by }}px; border-top: 3px solid #1d3474;"></div>
+          </sc-for>
+        </div>
+
+        <!-- STREET HAZE (extends to ground) -->
+        <div style="position: absolute; left: -120px; right: -120px; bottom: 0; height: 292px; background: linear-gradient(180deg, rgba(255, 176, 74, 0) 0%, rgba(255, 168, 74, .1) 55%, rgba(255, 190, 110, .26) 100%); pointer-events: none;"></div>
+
+        <!-- WATER TOWER -->
+        <div style="position: absolute; left: 36px; bottom: 290px; width: 96px; height: 96px; background: #1c2d5c; box-shadow: inset 0 6px 0 #2f4c8c, inset -8px 0 0 rgba(6, 12, 32, .45);"></div>
+        <div style="position: absolute; left: 24px; bottom: 386px; width: 120px; height: 20px; background: #263c72;"></div>
+        <div style="position: absolute; left: 54px; bottom: 250px; width: 10px; height: 44px; background: #1b2a55;"></div>
+        <div style="position: absolute; left: 104px; bottom: 250px; width: 10px; height: 44px; background: #1b2a55;"></div>
+
+        <!-- ANTENNA -->
+        <div style="position: absolute; left: 222px; bottom: 250px; width: 9px; height: 200px; background: #2a4076;"></div>
+        <div style="position: absolute; left: 216px; bottom: 450px; width: 20px; height: 10px; background: #e8413a; animation: blink 1.4s steps(1, end) infinite;"></div>
+        <div style="position: absolute; left: 206px; bottom: 380px; width: 40px; height: 6px; background: #2a4076;"></div>
+
+        <!-- AC UNIT -->
+        <div style="position: absolute; left: 318px; bottom: 250px; width: 104px; height: 62px; background: #22366b; box-shadow: inset 0 5px 0 #3a5c9e, inset -8px 0 0 rgba(6, 12, 32, .4);"></div>
+        <div style="position: absolute; left: 334px; bottom: 312px; width: 34px; height: 14px; background: #2c4784;"></div>
+
+        <!-- ROOF SLAB -->
+        <div style="position: absolute; left: -240px; width: 1060px; bottom: 0; height: 250px;">
+          <div style="position: absolute; left: 0; right: 0; top: 0; height: 30px; background: #33508f; box-shadow: inset 0 4px 0 #5d8fd6, inset 0 -5px 0 rgba(6, 12, 32, .5);"></div>
+          <div style="position: absolute; left: 0; right: 0; top: 30px; bottom: 0; background-color: #16244a; background-image: repeating-linear-gradient(90deg, rgba(255, 255, 255, .035) 0 3px, transparent 3px 22px), repeating-linear-gradient(180deg, rgba(0, 0, 0, .3) 0 2px, transparent 2px 26px);"></div>
+          <div style="position: absolute; right: 0; top: 0; width: 22px; bottom: 0; background: #0c1630;"></div>
+          <div style="position: absolute; right: 22px; top: 30px; width: 10px; bottom: 0; background: rgba(120, 175, 230, .1);"></div>
+        </div>
+
+        <!-- SPIDEY, TURNED AROUND -->
+        <div style="position: absolute; left: 556px; bottom: 250px; width: 208px; height: 400px; animation: jolt 0.28s steps(2, end) infinite;">
+          <img src="sprites/spidey-side-new.png" style="position: absolute; left: 0; top: 0; width: 208px; height: 400px; display: block; transform: scaleX(-1);" alt="Spider-Man snapping around on the rooftop as his spider-sense fires" />
+          <div style="position: absolute; left: -8px; top: 394px; width: 224px; height: 16px; background: radial-gradient(ellipse at center, rgba(6, 12, 32, .7) 0%, rgba(6, 12, 32, 0) 70%);"></div>
+
+          <!-- SENSE RINGS behind the head -->
+          <div style="position: absolute; left: 20px; top: -24px; width: 168px; height: 168px; border-radius: 50%; box-shadow: 0 0 0 6px rgba(255, 176, 60, .45); animation: senseRing 1.1s linear infinite;"></div>
+          <div style="position: absolute; left: 20px; top: -24px; width: 168px; height: 168px; border-radius: 50%; box-shadow: 0 0 0 6px rgba(255, 176, 60, .35); animation: senseRing 1.1s linear infinite; animation-delay: .55s;"></div>
+
+          <!-- SPIDER-SENSE BOLTS -->
+          <div style="position: absolute; left: -46px; top: 4px; width: 8px; height: 8px; box-shadow: {{ boltBig }}; animation: zap 0.42s steps(1, end) infinite;"></div>
+          <div style="position: absolute; left: -104px; top: 92px; width: 7px; height: 7px; box-shadow: {{ boltMid }}; animation: zap 0.42s steps(1, end) infinite; animation-delay: .14s;"></div>
+          <div style="position: absolute; left: -40px; top: 168px; width: 6px; height: 6px; box-shadow: {{ boltSmall }}; animation: zap 0.42s steps(1, end) infinite; animation-delay: .28s;"></div>
+
+          <!-- NAME TAG -->
+          <div style="position: absolute; left: 34px; top: -56px; display: flex; align-items: center; gap: 6px; padding: 4px 8px; background: #0f1c3c; box-shadow: 0 0 0 3px #4a9fd8;">
+            <span style="width: 7px; height: 7px; background: #e8413a; display: block;"></span>
+            <span style="font-size: 11px; color: #9ed8f5; letter-spacing: .1em;">SPIDEY</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- HUD: SPIDER-SENSE METER -->
+      <div style="position: absolute; right: 26px; bottom: 92px; z-index: 6; display: flex; flex-direction: column; align-items: flex-end; gap: 7px;">
+        <span style="font-size: 11px; color: #f2a93b; letter-spacing: .16em; animation: blink 0.5s steps(1, end) infinite;">! SPIDER-SENSE</span>
+        <div style="display: flex; gap: 3px; padding: 4px; background: #0f1c3c; box-shadow: 0 0 0 3px #4a9fd8;">
+          <sc-for list="{{ senseBars }}" as="bar" hint-placeholder-count="12">
+            <span style="width: 9px; height: 16px; display: block; background: {{ bar.color }};"></span>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- DISTANT SCREAM, FOURTEEN BLOCKS EAST -->
+      <sc-if value="{{ screamOn }}" hint-placeholder-val="{{ true }}">
+        <div style="position: absolute; left: max(26px, calc(50% - 592px)); bottom: 250px; z-index: 6; display: flex; flex-direction: column; gap: 10px; align-items: flex-start;">
+          <div style="position: relative; padding: 18px 26px; background: #f4f1e6; clip-path: polygon(0 22%, 9% 10%, 18% 20%, 29% 4%, 40% 18%, 52% 0, 63% 17%, 76% 6%, 86% 20%, 100% 12%, 94% 34%, 100% 52%, 92% 66%, 100% 84%, 86% 82%, 76% 96%, 64% 82%, 52% 100%, 40% 83%, 28% 95%, 18% 80%, 6% 90%, 10% 66%, 0 52%, 7% 36%); animation: screamPulse 0.7s steps(2, end) infinite;">
+            <span style="font-family: 'Press Start 2P', monospace; font-size: 15px; color: #c2241d; letter-spacing: .04em;">AAAAAH!</span>
+          </div>
+          <span style="font-size: 13px; color: rgba(185, 140, 240, .85); letter-spacing: .22em; margin-left: 8px;">ha ha ha ha ha</span>
+        </div>
+      </sc-if>
+
+      <!-- COMIC DIALOG BALLOON: SPIDEY -->
+      <div style="position: absolute; right: max(24px, calc(50% - 600px)); top: 118px; width: min(400px, calc(50% - 200px)); min-width: 260px; z-index: 6;">
+        <div style="position: relative; background: #f4f1e6; padding: 5px; box-shadow: 0 0 0 4px #16121c, 10px 12px 0 rgba(4, 10, 30, .55);">
+          <div style="border: 3px solid #4a9fd8; padding: 17px 18px 19px; display: flex; flex-direction: column; gap: 13px;">
+            <p style="margin: 0; font-size: 13px; line-height: 1.95; color: #16121c; letter-spacing: .02em; text-wrap: pretty;"><span style="font-family: 'Press Start 2P', monospace; font-size: 12px; color: #c2241d; line-height: 2.2;">THAT'S MJ.</span> Half a second of scream and my skull already knows the street, the block, the fire escape she's standing on.</p>
+            <p style="margin: 0; font-size: 13px; line-height: 1.95; color: #16121c; letter-spacing: .02em; text-wrap: pretty;">And under it, that <em style="font-style: normal; font-weight: 700;">laugh</em>. There's exactly <span style="font-weight: 700; color: #c2241d;">ONE</span> guy in this city who laughs like a broken carnival ride.</p>
+            <p style="margin: 0; font-size: 13px; line-height: 1.95; color: #4a3f2e; letter-spacing: .02em; text-wrap: pretty;">...Zipping up on the way.</p>
+          </div>
+          <div style="position: absolute; left: -14px; top: 52%; width: 28px; height: 28px; background: #f4f1e6; transform: rotate(45deg); box-shadow: -5px 5px 0 0 #16121c;"></div>
+        </div>
+      </div>
+
+      <!-- SENSE FLASH OVER THE WHOLE FRAME -->
+      <div style="position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 56% 34%, rgba(255, 176, 60, .18) 0%, rgba(255, 176, 60, 0) 46%); animation: zap 0.42s steps(1, end) infinite;"></div>
+
+      <!-- PRESS SPACE PLAQUE -->
+      <sc-if value="{{ letterbox }}" hint-placeholder-val="{{ true }}">
+        <div style="position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); pointer-events: none; z-index: 7;">
+          <div style="background: #4a9fd8; padding: 3px; clip-path: polygon(7px 0, calc(100% - 7px) 0, 100% 7px, 100% calc(100% - 7px), calc(100% - 7px) 100%, 7px 100%, 0 calc(100% - 7px), 0 7px);">
+            <div style="background: #12213f; padding: 11px 26px; display: flex; align-items: center; gap: 14px; clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);">
+              <span style="font-size: 13px; color: #9ed8f5; letter-spacing: .12em; animation: blink 0.9s steps(1, end) infinite;">◼ PRESS SPACE TO CONTINUE</span>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- SCANLINES + VIGNETTE -->
+      <div style="position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(180deg, rgba(0, 0, 0, .16) 0 2px, rgba(0, 0, 0, 0) 2px 4px); mix-blend-mode: multiply;"></div>
+      <div style="position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 130px 34px rgba(3, 7, 20, .68);"></div>
+
+    </div>
+
+  </div>
+  </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showScream&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Scene&quot;},&quot;senseLevel&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:12,&quot;min&quot;:0,&quot;max&quot;:12,&quot;step&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Scene&quot;},&quot;showLetterbox&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Presentation&quot;}}">
+class Component extends DCLogic {
+  seedRand(seed) {
+    let a = seed;
+    return () => {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  // Pixel lightning bolt rendered as a box-shadow bitmap, with an auto black outline.
+  bolt(p) {
+    const rows = [
+      '...###',
+      '..###.',
+      '.###..',
+      '######',
+      '..###.',
+      '.###..',
+      '###...',
+      '##....'
+    ];
+    const grid = rows.map(r => r.split('').map(c => c === '#'));
+    const H = grid.length, W = rows[0].length;
+    const on = (x, y) => y >= 0 && y < H && x >= 0 && x < W && grid[y][x];
+    const out = [];
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        if (!grid[y][x]) continue;
+        const fill = y < 2 ? '#ffd23d' : (y < 5 ? '#ff9f1c' : '#f2760a');
+        out.push(x * p + 'px ' + y * p + 'px 0 0 ' + fill);
+      }
+    }
+    for (let y = -1; y <= H; y++) {
+      for (let x = -1; x <= W; x++) {
+        if (on(x, y)) continue;
+        const edge = on(x - 1, y) || on(x + 1, y) || on(x, y - 1) || on(x, y + 1) ||
+                     on(x - 1, y - 1) || on(x + 1, y - 1) || on(x - 1, y + 1) || on(x + 1, y + 1);
+        if (edge) out.push(x * p + 'px ' + y * p + 'px 0 0 #16121c');
+      }
+    }
+    return out.join(', ');
+  }
+
+  renderVals() {
+    const rand = this.seedRand(50218);
+    const farBuildings = Array.from({ length: 24 }, () => ({
+      w: Math.round(50 + rand() * 78),
+      h: Math.round(80 + rand() * 140) + 142
+    }));
+    const windowTints = ['rgba(126, 190, 240, .5)', 'rgba(126, 190, 240, .42)', 'rgba(242, 200, 90, .32)'];
+    const midBuildings = Array.from({ length: 18 }, () => ({
+      w: Math.round(66 + rand() * 92),
+      h: Math.round(86 + rand() * 112) + 142,
+      window: windowTints[Math.floor(rand() * windowTints.length)],
+      bx: Math.round(6 + rand() * 8),
+      by: Math.round(10 + rand() * 4)
+    }));
+    const starPts = [];
+    for (let i = 0; i < 44; i++) {
+      const x = Math.round(rand() * 1500);
+      const y = Math.round(rand() * 260);
+      const c = rand() > 0.5 ? '#fff' : (rand() > 0.5 ? '#9fc4ff' : '#7fa8e8');
+      starPts.push(x + 'px ' + y + 'px ' + c);
+    }
+
+    const level = Math.round((this.props.senseLevel ?? 12));
+    const senseBars = Array.from({ length: 12 }, (_, i) => ({
+      color: i < level ? (i > 8 ? '#e8413a' : '#f2a93b') : 'rgba(74, 159, 216, .22)'
+    }));
+
+    return {
+      farBuildings,
+      midBuildings,
+      starsShadow: starPts.join(', '),
+      boltBig: this.bolt(8),
+      boltMid: this.bolt(7),
+      boltSmall: this.bolt(6),
+      senseBars,
+      screamOn: this.props.showScream ?? true,
+      letterbox: this.props.showLetterbox ?? true
+    };
+  }
+}
+</script>
+</body>
+</html>

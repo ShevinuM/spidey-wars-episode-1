@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet" />
+<style>
+  html, body { height: 100%; margin: 0; background: #060d22; }
+  a { color: #f2a93b; text-decoration: none; }
+  a:hover { color: #ffd27a; }
+  img { image-rendering: pixelated; -webkit-user-drag: none; }
+  @keyframes blink { 0%, 60% { opacity: 1 } 61%, 100% { opacity: .25 } }
+  @keyframes bob { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(-9px) } }
+  @keyframes sway { 0%, 100% { transform: rotate(-3deg) } 50% { transform: rotate(3deg) } }
+  @keyframes flamePulse { 0%, 100% { opacity: .45 } 50% { opacity: .9 } }
+  @keyframes heartFloat1 { 0%, 100% { transform: translateY(0) scale(1); opacity: .95 } 50% { transform: translateY(-14px) scale(1.15); opacity: 1 } }
+  @keyframes heartFloat2 { 0%, 100% { transform: translateY(0) scale(1); opacity: .85 } 50% { transform: translateY(-10px) scale(1.08); opacity: 1 } }
+  @keyframes heartFloat3 { 0%, 100% { transform: translateY(0) scale(1); opacity: .9 } 50% { transform: translateY(-18px) scale(1.2); opacity: 1 } }
+  @keyframes flyingKiss { 0% { transform: translate(0, 0) scale(.5); opacity: 0 } 15% { opacity: 1 } 100% { transform: translate(52px, -22px) scale(1.3); opacity: 0 } }
+</style>
+</helmet>
+<div style="width: 100%; height: 100%; position: relative; font-family: 'Silkscreen', monospace; display: flex; flex-direction: column; box-sizing: border-box;">
+
+  <div style="background: #4a9fd8; padding: 4px; clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px); flex: 1; display: flex; flex-direction: column; min-height: 0; box-sizing: border-box;">
+  <div style="background: #0b1c3f; padding: 8px; clip-path: polygon(9px 0, calc(100% - 9px) 0, 100% 9px, 100% calc(100% - 9px), calc(100% - 9px) 100%, 9px 100%, 0 calc(100% - 9px), 0 9px); flex: 1; display: flex; flex-direction: column; min-height: 0; box-sizing: border-box;">
+  <div style="background: #1a4f82; padding: 3px; position: relative; flex: 1; display: flex; flex-direction: column; min-height: 0; box-sizing: border-box;">
+
+    <div style="position: relative; width: 100%; flex: 1 0 auto; min-height: 702px; overflow: hidden; background: linear-gradient(180deg, #04081c 0%, #071130 30%, #0d1c45 58%, #16274f 82%, #223256 100%);">
+
+      <!-- STARS + MOON -->
+      <div style="position: absolute; inset: 0; pointer-events: none;">
+        <div style="position: absolute; left: 40px; top: 30px; width: 3px; height: 3px; background: #dbe9ff; box-shadow: {{ starsShadow }};"></div>
+        <div style="position: absolute; right: 96px; top: 64px; width: 58px; height: 58px; border-radius: 50%; background: #e8f0ff; box-shadow: 0 0 54px 18px rgba(150, 190, 255, .2);"></div>
+        <div style="position: absolute; right: 128px; top: 80px; width: 10px; height: 10px; background: #c9d8f2;"></div>
+        <div style="position: absolute; right: 110px; top: 100px; width: 7px; height: 7px; background: #c9d8f2;"></div>
+      </div>
+
+      <!-- FAR SKYLINE -->
+      <div style="position: absolute; left: -10px; right: -10px; bottom: 0; height: 260px; display: flex; align-items: flex-end; gap: 8px; opacity: .8;">
+        <sc-for list="{{ farBuildings }}" as="b" hint-placeholder-count="26">
+          <div style="width: {{ b.w }}px; height: {{ b.h }}px; background: #0e1c44; flex: none;"></div>
+        </sc-for>
+      </div>
+
+      <!-- MID SKYLINE -->
+      <div style="position: absolute; left: -30px; right: -30px; bottom: 0; height: 220px; display: flex; align-items: flex-end; gap: 12px;">
+        <sc-for list="{{ midBuildings }}" as="b" hint-placeholder-count="20">
+          <div style="width: {{ b.w }}px; height: {{ b.h }}px; flex: none; background-color: #15275a; background-image: repeating-linear-gradient(180deg, transparent 0 4px, #15275a 4px 14px), repeating-linear-gradient(90deg, {{ b.window }} 0 4px, transparent 4px 14px); background-position: {{ b.bx }}px {{ b.by }}px; border-top: 3px solid #1d3474;"></div>
+        </sc-for>
+      </div>
+
+      <!-- STREET HAZE -->
+      <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 170px; background: linear-gradient(180deg, rgba(255, 176, 74, 0) 0%, rgba(255, 168, 74, .12) 55%, rgba(255, 190, 110, .3) 100%); pointer-events: none;"></div>
+
+      <!-- HERO BUILDING (CENTERED CLOSE-UP) -->
+      <div style="position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: 620px; height: 320px;">
+
+        <!-- facade -->
+        <div style="position: absolute; left: 0; right: 0; top: 44px; bottom: 0; background-color: #1b2c5a; background-image: repeating-linear-gradient(180deg, transparent 0 10px, #1b2c5a 10px 34px), repeating-linear-gradient(90deg, rgba(242, 200, 90, .62) 0 14px, transparent 14px 46px); background-position: 26px 24px; box-shadow: inset 14px 0 0 rgba(120, 175, 230, .07), inset -16px 0 0 rgba(6, 12, 32, .45);"></div>
+
+        <!-- roof deck -->
+        <div style="position: absolute; left: -18px; right: -18px; top: 22px; height: 26px; background: #33508f; box-shadow: inset 0 3px 0 #5d8fd6, inset 0 -4px 0 rgba(6, 12, 32, .5);"></div>
+        <div style="position: absolute; left: -18px; right: -18px; top: 48px; height: 8px; background: #24386e;"></div>
+
+        <!-- parapet -->
+        <sc-for list="{{ parapet }}" as="p" hint-placeholder-count="14">
+          <div style="position: absolute; left: {{ p.left }}px; top: 6px; width: 26px; height: 18px; background: #2c4784; box-shadow: inset 0 3px 0 #4a9fd8;"></div>
+        </sc-for>
+
+        <!-- rooftop props -->
+        <div style="position: absolute; right: 116px; top: -70px; width: 62px; height: 76px; background: #22366b; box-shadow: inset 0 5px 0 #3a5c9e, inset -6px 0 0 rgba(6, 12, 32, .4);"></div>
+        <div style="position: absolute; right: 108px; top: -80px; width: 78px; height: 12px; background: #2c4784;"></div>
+        <div style="position: absolute; right: 138px; top: 6px; width: 18px; height: 22px; background: #1b2c5a;"></div>
+        <div style="position: absolute; right: 100px; top: 6px; width: 18px; height: 22px; background: #1b2c5a;"></div>
+
+        <div style="position: absolute; left: 210px; top: -34px; width: 54px; height: 40px; background: #22366b; box-shadow: inset 0 4px 0 #3a5c9e;"></div>
+        <div style="position: absolute; left: 222px; top: -46px; width: 30px; height: 12px; background: #2c4784;"></div>
+
+        <div style="position: absolute; left: 44px; top: -132px; width: 10px; height: 140px; background: #2a4076;"></div>
+        <div style="position: absolute; left: 40px; top: -142px; width: 18px; height: 10px; background: #e8413a; animation: blink 1.4s steps(1, end) infinite;"></div>
+        <div style="position: absolute; left: 30px; top: -96px; width: 38px; height: 6px; background: #2a4076;"></div>
+
+        <!-- MJ -->
+        <div style="position: absolute; right: 118px; top: -137px;">
+          <img src="sprites/mj-standing.png" style="width: 113px; height: 143px; display: block; transform: scaleX(-1);" alt="Mary Jane Watson standing on the rooftop, facing the Green Goblin" />
+          <div style="position: absolute; left: -4px; top: 138px; width: 120px; height: 12px; background: radial-gradient(ellipse at center, rgba(6, 12, 32, .65) 0%, rgba(6, 12, 32, 0) 70%);"></div>
+          <div style="position: absolute; left: 4px; top: -6px; display: flex; align-items: center; gap: 6px; padding: 4px 8px; background: #4a0f10; box-shadow: 0 0 0 3px #e8413a;">
+            <span style="width: 7px; height: 7px; background: #ff8d86; display: block;"></span>
+            <span style="font-size: 11px; color: #ffd7d5; letter-spacing: .1em;">MJ</span>
+          </div>
+        </div>
+
+        <!-- GOBLIN ON GLIDER -->
+        <div style="position: absolute; left: 70px; top: -137px; animation: bob 2.6s ease-in-out infinite;">
+          <img src="sprites/goblin-hover.png" style="width: 150px; height: 143px; display: block;" alt="Green Goblin hovering on his glider, smitten, with heart-shaped eyes and blushing cheeks" />
+          <!-- BLUSH -->
+          <div style="position: absolute; left: 34px; top: 47px; width: 12px; height: 8px; background: #ff5c7a; opacity: .55; border-radius: 50%; filter: blur(1px);"></div>
+          <div style="position: absolute; left: 90px; top: 47px; width: 12px; height: 8px; background: #ff5c7a; opacity: .55; border-radius: 50%; filter: blur(1px);"></div>
+          <!-- HEART EYES -->
+          <div style="position: absolute; left: 50px; top: 30px; width: 3px; height: 3px; background: transparent; box-shadow: 3px 0 0 0 #ff2d55, 9px 0 0 0 #ff2d55, 0 3px 0 0 #ff2d55, 3px 3px 0 0 #ff2d55, 6px 3px 0 0 #ff2d55, 9px 3px 0 0 #ff2d55, 12px 3px 0 0 #ff2d55, 0 6px 0 0 #ff2d55, 3px 6px 0 0 #ff2d55, 6px 6px 0 0 #ff2d55, 9px 6px 0 0 #ff2d55, 12px 6px 0 0 #ff2d55, 3px 9px 0 0 #ff2d55, 6px 9px 0 0 #ff2d55, 9px 9px 0 0 #ff2d55, 6px 12px 0 0 #ff2d55;"></div>
+          <div style="position: absolute; left: 71px; top: 30px; width: 3px; height: 3px; background: transparent; box-shadow: 3px 0 0 0 #ff2d55, 9px 0 0 0 #ff2d55, 0 3px 0 0 #ff2d55, 3px 3px 0 0 #ff2d55, 6px 3px 0 0 #ff2d55, 9px 3px 0 0 #ff2d55, 12px 3px 0 0 #ff2d55, 0 6px 0 0 #ff2d55, 3px 6px 0 0 #ff2d55, 6px 6px 0 0 #ff2d55, 9px 6px 0 0 #ff2d55, 12px 6px 0 0 #ff2d55, 3px 9px 0 0 #ff2d55, 6px 9px 0 0 #ff2d55, 9px 9px 0 0 #ff2d55, 6px 12px 0 0 #ff2d55;"></div>
+          <!-- PUCKERED KISS MOUTH -->
+          <div style="position: absolute; left: 63px; top: 47px; width: 7px; height: 5px; background: #c81e4a; border-radius: 50%;"></div>
+          <!-- FLYING KISS HEART -->
+          <span style="position: absolute; left: 74px; top: 40px; font-family: 'Press Start 2P', monospace; font-size: 13px; color: #ff5c7a; text-shadow: 1px 1px 0 #7b2fbe; animation: flyingKiss 1.8s ease-out infinite; pointer-events: none;">♥</span>
+          <!-- BOUQUET OF FLOWERS -->
+          <div style="position: absolute; left: -12px; top: 58px; width: 24px; height: 40px;">
+            <div style="position: absolute; left: 10px; top: 16px; width: 3px; height: 24px; background: #2f7d3a;"></div>
+            <div style="position: absolute; left: 0; top: 0; width: 9px; height: 9px; border-radius: 50%; background: #ff5c7a;"></div>
+            <div style="position: absolute; left: 0; top: 3px; width: 3px; height: 3px; border-radius: 50%; background: #ffe27a;"></div>
+            <div style="position: absolute; left: 8px; top: -4px; width: 9px; height: 9px; border-radius: 50%; background: #ffd166;"></div>
+            <div style="position: absolute; left: 8px; top: -1px; width: 3px; height: 3px; border-radius: 50%; background: #c81e4a;"></div>
+            <div style="position: absolute; left: 15px; top: 2px; width: 9px; height: 9px; border-radius: 50%; background: #f4f1e6;"></div>
+            <div style="position: absolute; left: 15px; top: 5px; width: 3px; height: 3px; border-radius: 50%; background: #ffd166;"></div>
+          </div>
+          <div style="position: absolute; left: 10px; top: 148px; width: 130px; height: 16px; background: radial-gradient(ellipse at center, rgba(255, 149, 0, .55) 0%, rgba(255, 149, 0, 0) 70%); animation: flamePulse 0.6s steps(2, end) infinite;"></div>
+          <div style="position: absolute; left: 2px; top: -6px; display: flex; align-items: center; gap: 6px; padding: 4px 8px; background: #2b0f4d; box-shadow: 0 0 0 3px #7b2fbe;">
+            <span style="width: 7px; height: 7px; background: #4cc94c; display: block;"></span>
+            <span style="font-size: 11px; color: #d9b6ff; letter-spacing: .08em;">GOBLIN</span>
+          </div>
+
+          <!-- FLOATING HEARTS -->
+          <span style="position: absolute; left: -22px; top: 8px; font-family: 'Press Start 2P', monospace; font-size: 18px; color: #ff5c7a; text-shadow: 2px 2px 0 #7b2fbe; animation: heartFloat1 1.8s ease-in-out infinite;">♥</span>
+          <span style="position: absolute; left: 152px; top: -4px; font-family: 'Press Start 2P', monospace; font-size: 14px; color: #ff8ba0; text-shadow: 2px 2px 0 #7b2fbe; animation: heartFloat2 2.2s ease-in-out infinite .3s;">♥</span>
+          <span style="position: absolute; left: 66px; top: -40px; font-family: 'Press Start 2P', monospace; font-size: 12px; color: #ffb3c2; text-shadow: 2px 2px 0 #7b2fbe; animation: heartFloat3 2s ease-in-out infinite .6s;">♥</span>
+        </div>
+
+      </div>
+
+      <!-- COMIC DIALOG BALLOON -->
+      <div style="position: absolute; left: 50%; top: 76px; transform: translateX(-50%); width: min(760px, calc(100% - 120px)); z-index: 6;">
+        <div style="position: relative; background: #f4f1e6; padding: 5px; box-shadow: 0 0 0 4px #16121c, 10px 12px 0 rgba(4, 10, 30, .55);">
+          <div style="border: 3px solid #7b2fbe; padding: 20px 24px 22px; display: flex; flex-direction: column; gap: 14px;">
+            <p style="margin: 0; font-size: 15px; line-height: 1.95; color: #16121c; letter-spacing: .02em; text-wrap: pretty;"><span style="font-family: 'Press Start 2P', monospace; font-size: 15px; color: #7b2fbe; line-height: 2.2;">AH, MISS WATSON!</span> Radiant! Incandescent! A face like that shouldn't be wasted on wall-crawlers and wage slaves. The Goblin has made his selection. <span style="color: #c2241d; font-weight: 700;">Dinner. Tonight.</span> You'll say yes — they always do, in the end!</p>
+          </div>
+          <!-- balloon tail -->
+          <div style="position: absolute; left: 104px; bottom: -15px; width: 30px; height: 30px; background: #f4f1e6; transform: rotate(45deg); box-shadow: 5px 5px 0 0 #16121c;"></div>
+        </div>
+      </div>
+
+      <!-- SCENE CHROME: PRESS SPACE PLAQUE -->
+      <sc-if value="{{ letterbox }}" hint-placeholder-val="{{ true }}">
+        <div style="position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); pointer-events: none; z-index: 7;">
+          <div style="background: #4a9fd8; padding: 3px; clip-path: polygon(7px 0, calc(100% - 7px) 0, 100% 7px, 100% calc(100% - 7px), calc(100% - 7px) 100%, 7px 100%, 0 calc(100% - 7px), 0 7px);">
+            <div style="background: #12213f; padding: 11px 26px; display: flex; align-items: center; gap: 14px; clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);">
+              <span style="font-size: 13px; color: #9ed8f5; letter-spacing: .12em; animation: blink 0.9s steps(1, end) infinite;">◼ PRESS SPACE TO CONTINUE</span>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- SCANLINES + VIGNETTE -->
+      <div style="position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(180deg, rgba(0, 0, 0, .16) 0 2px, rgba(0, 0, 0, 0) 2px 4px); mix-blend-mode: multiply;"></div>
+      <div style="position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 130px 34px rgba(3, 7, 20, .68);"></div>
+
+    </div>
+
+  </div>
+  </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showLetterbox&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Presentation&quot;}}">
+class Component extends DCLogic {
+  seedRand(seed) {
+    let a = seed;
+    return () => {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  renderVals() {
+    const rand = this.seedRand(90613);
+    const farBuildings = Array.from({ length: 26 }, () => ({
+      w: Math.round(48 + rand() * 78),
+      h: Math.round(90 + rand() * 150)
+    }));
+    const windowTints = ['rgba(126, 190, 240, .5)', 'rgba(126, 190, 240, .42)', 'rgba(242, 200, 90, .32)'];
+    const midBuildings = Array.from({ length: 20 }, () => ({
+      w: Math.round(62 + rand() * 92),
+      h: Math.round(92 + rand() * 118),
+      window: windowTints[Math.floor(rand() * windowTints.length)],
+      bx: Math.round(6 + rand() * 8),
+      by: Math.round(10 + rand() * 4)
+    }));
+    const starPts = [];
+    for (let i = 0; i < 46; i++) {
+      const x = Math.round(rand() * 1500);
+      const y = Math.round(rand() * 280);
+      const c = rand() > 0.5 ? '#fff' : (rand() > 0.5 ? '#9fc4ff' : '#7fa8e8');
+      starPts.push(x + 'px ' + y + 'px ' + c);
+    }
+    return {
+      farBuildings,
+      midBuildings,
+      starsShadow: starPts.join(', '),
+      parapet: Array.from({ length: 17 }, (_, i) => ({ left: -14 + i * 38 })),
+      letterbox: this.props.showLetterbox ?? true
+    };
+  }
+}
+</script>
+</body>
+</html>
