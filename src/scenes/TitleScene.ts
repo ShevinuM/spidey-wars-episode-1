@@ -1,6 +1,7 @@
 import Phaser from "phaser";
-import { BLINK_MS, PROMPT_PLAQUE_SLICE, TITLE_PLAQUE_SLICE } from "../config/tuning.ts";
+import { TITLE_PLAQUE_SLICE } from "../config/tuning.ts";
 import { COLORS } from "../ui/colors.ts";
+import { createPressPlaque } from "../ui/press-plaque.ts";
 
 interface TitleSceneData {
   readonly blink?: boolean;
@@ -28,25 +29,16 @@ const TITLE_STRIP_BORDER = 3;
 // Same line's `background: rgba(4, 10, 30, .82)` — `COLORS.titleFill` is that same rgb triple.
 const TITLE_STRIP_FILL_ALPHA = 0.82;
 
-// `reference/design/Scene 2 - Rooftop Relief.dc.html:120` `padding: 11px 26px` inside the prompt plaque's inner clip.
-const PROMPT_PAD_X = 26;
-const PROMPT_PAD_Y = 11;
-// Same line's `gap: 14px`, trimmed to the space between the drawn marker and the label.
-const PROMPT_MARKER_GAP = 14;
-// `reference/design/Game UI.dc.html:220` draws its own `9px` square marker beside a Silkscreen label — the same idiom, since no font here has a `◼` glyph (missing-glyph lists in `scripts/lib/bmfont-xml.test.ts`).
-const PROMPT_MARKER_SIZE = 9;
 // `reference/design/Scene 2 - Rooftop Relief.dc.html:118` `bottom: 18px`.
 const PROMPT_BOTTOM_Y = 18;
 
 // `reference/design/Game UI.dc.html:163` `letter-spacing: .04em` at 19 px scales to `.04 * 24 = 0.96` for the pressstart-24 title run, rounded to a whole pixel.
 const TITLE_LETTER_SPACING = 1;
-// `reference/design/Game UI.dc.html:170-172`'s `.12em` at 11 px and `reference/design/Scene 2 - Rooftop Relief.dc.html:121`'s `.12em` at 13 px both scale to `.12 * 16 = 1.92` for silkscreen-16 runs, rounded to a whole pixel.
+// `reference/design/Game UI.dc.html:170-172`'s `.12em` at 11 px scales to `.12 * 16 = 1.92` for the EP.1 strip's silkscreen-16 run, rounded to a whole pixel.
 const SILKSCREEN_LETTER_SPACING = 2;
 
 export class TitleScene extends Phaser.Scene {
   private blinkEnabled = true;
-  private promptMarker!: Phaser.GameObjects.Rectangle;
-  private promptLabel!: Phaser.GameObjects.BitmapText;
 
   constructor() {
     super("TitleScene");
@@ -60,7 +52,12 @@ export class TitleScene extends Phaser.Scene {
     this.add.image(0, 0, "sky").setOrigin(0, 0).setDepth(0);
 
     this.buildTitleBlock();
-    this.buildPromptBlock();
+    createPressPlaque(this, {
+      label: PROMPT_LABEL,
+      centerX: WIDTH / 2,
+      bottomY: HEIGHT - PROMPT_BOTTOM_Y,
+      blink: this.blinkEnabled,
+    }).setDepth(1);
 
     this.add.image(0, 0, "crt").setOrigin(0, 0).setDepth(10);
 
@@ -151,65 +148,5 @@ export class TitleScene extends Phaser.Scene {
       .setOrigin(0, 0)
       .setTint(COLORS.titleText)
       .setDepth(3);
-  }
-
-  private buildPromptBlock(): void {
-    const label = this.add
-      .bitmapText(0, 0, "silkscreen-16", PROMPT_LABEL)
-      .setLetterSpacing(SILKSCREEN_LETTER_SPACING);
-    const textW = Math.round(label.width);
-    const textH = Math.round(label.height);
-
-    const contentW = PROMPT_MARKER_SIZE + PROMPT_MARKER_GAP + textW;
-    const contentH = Math.max(PROMPT_MARKER_SIZE, textH);
-    const plaqueW = contentW + 2 * PROMPT_PAD_X;
-    const plaqueH = contentH + 2 * PROMPT_PAD_Y;
-    const plaqueX = Math.round((WIDTH - plaqueW) / 2);
-    const plaqueY = HEIGHT - PROMPT_BOTTOM_Y - plaqueH;
-    const corner = PROMPT_PLAQUE_SLICE.corner;
-
-    this.add
-      .nineslice(
-        plaqueX,
-        plaqueY,
-        "plaque-9",
-        undefined,
-        plaqueW,
-        plaqueH,
-        corner,
-        corner,
-        corner,
-        corner,
-      )
-      .setOrigin(0, 0)
-      .setDepth(1);
-
-    const contentX = plaqueX + PROMPT_PAD_X;
-    const contentY = plaqueY + PROMPT_PAD_Y;
-    const markerY = contentY + Math.round((contentH - PROMPT_MARKER_SIZE) / 2);
-    const textY = contentY + Math.round((contentH - textH) / 2);
-
-    this.promptMarker = this.add
-      .rectangle(contentX, markerY, PROMPT_MARKER_SIZE, PROMPT_MARKER_SIZE, COLORS.promptText)
-      .setOrigin(0, 0)
-      .setDepth(2);
-
-    this.promptLabel = label
-      .setPosition(contentX + PROMPT_MARKER_SIZE + PROMPT_MARKER_GAP, textY)
-      .setOrigin(0, 0)
-      .setTint(COLORS.promptText)
-      .setDepth(2);
-
-    if (this.blinkEnabled) {
-      this.time.addEvent({
-        delay: BLINK_MS,
-        loop: true,
-        callback: () => {
-          const visible = !this.promptMarker.visible;
-          this.promptMarker.setVisible(visible);
-          this.promptLabel.setVisible(visible);
-        },
-      });
-    }
   }
 }
