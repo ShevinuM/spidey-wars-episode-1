@@ -23,7 +23,7 @@ Phaser-4-specific configuration and API facts that would otherwise cost debuggin
 
 ## Classes
 
-- [ ] **R008** Scene files (`BootScene.ts`, `TitleScene.ts`, `CutsceneScene.ts`, `GameScene.ts`, `UIScene.ts`, `GameOverScene.ts`) are `Phaser.Scene` subclasses. Together with FSM state objects (`sim/playerState.ts`), they are the only classes in this codebase — see `../general/classes.md`. Everything else, including all of `sim/`, exports functions operating on plain data.
+- [ ] **R008** Scene files (`BootScene.ts`, `TitleScene.ts`, `CutsceneScene.ts`, `GameScene.ts`, `UIScene.ts`, `GameOverScene.ts`) are `Phaser.Scene` subclasses. Together with FSM state objects (`sim/player-state.ts`), they are the only classes in this codebase — see `../general/classes.md`. Everything else, including all of `sim/`, exports functions operating on plain data.
 
 ## Sources
 

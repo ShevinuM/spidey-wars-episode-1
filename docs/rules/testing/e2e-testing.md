@@ -9,7 +9,7 @@ What earns an e2e spec against the single `<canvas>`, how state is driven and as
 
 ## Driving and asserting state
 
-- [ ] **R003** There is one `<canvas>` and no DOM to query, so locator-based page objects do not apply here. Drive the game only through `window.__TEST__`'s methods — `goto(scene)`, `freeze()`, `stepTo(step)` — never through `page.locator`/`page.click` against game content. The one exception is the boot smoke test (R007), which needs a real user gesture.
+- [ ] **R003** There is one `<canvas>` and no DOM to query, so locator-based page objects do not apply here. Drive the game only through `window.__TEST__`'s methods — for example `goto(scene)`, `freeze()`, `stepTo(step)`, `replay()` — never through `page.locator`/`page.click` against game content. The one exception is the boot smoke test (R007), which needs a real user gesture.
 - [ ] **R004** Assert only through `__TEST__.state()`, `__TEST__.digest()`, and screenshots — never by inspecting DOM nodes (there are none to inspect) and never by hand-deriving expected pixel values; compare `state()`/`digest()` output structurally.
 - [ ] **R005** Never `page.waitForTimeout`. The game's state advances deterministically through `__TEST__.stepTo`/`freeze`, so there is always an exact step to wait for instead of a wall-clock delay — await the `__TEST__` call itself, or poll `__TEST__.state()`/readiness with Playwright's own expect-polling, never a fixed sleep.
 

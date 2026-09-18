@@ -13,7 +13,7 @@ The directory skeleton and the enforcement mechanics behind `../../architecture.
     config/         data only — tuning constants, cutscene Beat[] data
     scenes/         Phaser Scene subclasses — reads sim/cutscene, draws
     ui/             Phaser draw primitives and generateTexture bakes
-  scripts/          build-time tooling, never imports src/ (R004)
+  scripts/          build-time tooling, never imports src/ (R003)
   test/             e2e/visual/replay/audit suites — see ../testing/README.md
   ```
   Co-located unit tests (`foo.test.ts` beside `foo.ts`) live inside `sim/`, `cutscene/`, and `scripts/lib/` themselves; they are not a separate top-level tree — see `../testing/README.md` R001.

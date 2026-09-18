@@ -50,10 +50,10 @@ src/
     world.ts                the mutable state struct: every number the game is
     tick.ts                 fixed-timestep accumulator; the only entry point
     pendulum.ts             swing integration (semi-implicit Euler)
-    fallTimer.ts            MJ descent + impact countdown
-    batSpawner.ts           deterministic wave patterns from a seed
+    fall-timer.ts           MJ descent + impact countdown
+    bat-spawner.ts          deterministic wave patterns from a seed
     collide.ts              AABB checks the sim owns (bat↔spidey, spidey↔MJ)
-    playerState.ts          the FSM: Idle | Aiming | Swinging | Airborne | Catching | Hit
+    player-state.ts         the FSM: Idle | Aiming | Swinging | Airborne | Catching | Hit
     rng.ts                  seeded PRNG, ported from the .dc.html DCLogic
     events.ts               SimEvent union type + a tiny emitter
 
@@ -67,8 +67,8 @@ src/
 
   ui/
     primitives.ts           octagon, plaque, bevel, facade, vGradient
-    drawHudChrome.ts        the HUD, drawn once → texture
-    drawSceneBg.ts          six cutscene backdrops, drawn once → textures
+    draw-hud-chrome.ts      the HUD, drawn once → texture
+    draw-scene-bg.ts        six cutscene backdrops, drawn once → textures
 
   config/
     tuning.ts               EVERY magic number: gravity, swing torque, bat speed, fall time
@@ -142,7 +142,7 @@ Idle ──aim──▶ Aiming ──fire──▶ Swinging ──release──�
 ```
 
 Each state is an object with `enter() / update(dt) / exit()`. Working on `Swinging` means you
-do not have to hold `Idle` and `Hit` in your head. The FSM lives in `sim/playerState.ts` —
+do not have to hold `Idle` and `Hit` in your head. The FSM lives in `sim/player-state.ts` —
 sprite/animation changes happen in `GameScene` by reacting to the state _name_, so the FSM
 itself stays Phaser-free.
 
@@ -269,13 +269,13 @@ present, not in anticipation of one that may never arrive._
 
 Vitest, no browser, no WebGL, runs in about a second — because `sim/` imports nothing.
 
-| File                  | What it asserts                                                                                                                                               |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pendulum.test.ts`    | released from θ, returns to ≈θ (energy conserved — catches an explicit-Euler regression); reaches bottom in the expected time for a given `g` and rope length |
-| `fallTimer.test.ts`   | impact fires at exactly `t = fallDuration`; a catch before that flips the outcome and cancels impact                                                          |
-| `batSpawner.test.ts`  | same seed → identical wave; waves stay within reachable bounds                                                                                                |
-| `playerState.test.ts` | illegal transitions are rejected (`Hit` cannot go straight to `Catching`)                                                                                     |
-| `tick.test.ts`        | 100 × 16.6ms and 60 × 27.7ms advance the world to the same state (the 144Hz guarantee, asserted)                                                              |
+| File                   | What it asserts                                                                                                                                               |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pendulum.test.ts`     | released from θ, returns to ≈θ (energy conserved — catches an explicit-Euler regression); reaches bottom in the expected time for a given `g` and rope length |
+| `fall-timer.test.ts`   | impact fires at exactly `t = fallDuration`; a catch before that flips the outcome and cancels impact                                                          |
+| `bat-spawner.test.ts`  | same seed → identical wave; waves stay within reachable bounds                                                                                                |
+| `player-state.test.ts` | illegal transitions are rejected (`Hit` cannot go straight to `Catching`)                                                                                     |
+| `tick.test.ts`         | 100 × 16.6ms and 60 × 27.7ms advance the world to the same state (the 144Hz guarantee, asserted)                                                              |
 
 That last one is the test that protects the decision at the top of this document.
 
@@ -341,42 +341,18 @@ bundle is a speed cheat in a democratically ranked jam.
 - **Scenes own Phaser objects; the sim owns numbers.** A sprite never stores authoritative
   state — it mirrors `world`.
 - **No `any`.** `strict: true` in `tsconfig`.
-- **Enforced, not optional — and at two speeds.** The boundary is checked by ESLint (direct
-  imports, in-editor) and by `dependency-cruiser` (transitive chains + cycles, in CI). The rule
-  at the top of this document is a build gate, not a convention.
-
-  ```js
-  // eslint.config.js — catches it as you type. Direct imports only.
-  {
-    files: ['src/sim/**/*.ts'],
-    rules: {
-      'no-restricted-imports': ['error', {
-        patterns: [
-          { group: ['phaser', 'phaser/*'],       message: 'src/sim must stay engine-agnostic.' },
-          { group: ['**/scenes/**', '**/ui/**'], message: 'sim must not depend on rendering.' },
-        ],
-      }],
-    },
-  }
-  ```
-
-  ```js
-  // .dependency-cruiser.cjs — the `architecture` pnpm step. Catches TRANSITIVE leakage,
-  // which ESLint cannot: sim → src/util/vec2 → phaser passes no-restricted-imports.
-  forbidden: [
-    {
-      name: "sim-must-stay-pure",
-      severity: "error",
-      comment: "src/sim is engine-agnostic. See docs/architecture.md.",
-      from: { path: "^src/sim" },
-      to: { path: "^phaser|^src/scenes|^src/ui" },
-    },
-    { name: "no-circular", severity: "error", from: {}, to: { circular: true } },
-  ];
-  ```
-
-  Not redundant: different techniques (syntactic vs graph), different loops (editor vs CI).
-  `--output-type mermaid` also emits a dependency graph worth putting in the PR.
+- **Enforced, not optional — and at two speeds.** _Superseded 2026-09-18 (phase 02, step 5): this
+  bullet used to restate the linter/config-file mechanics inline, and drifted — it named ESLint
+  where the project uses oxlint, `.dependency-cruiser.cjs` where the real file is `.mjs`, and an
+  object-form `no-restricted-imports` pattern the installed config doesn't use. The exact,
+  currently-correct mechanics — read from the live `.oxlintrc.json` and
+  `.dependency-cruiser.mjs`, not restated here — now live in
+  [`docs/rules/general/architecture.md`](./rules/general/architecture.md) R003–R004 and
+  [`docs/rules/general/toolchain.md`](./rules/general/toolchain.md) R001. Per
+  [`documentation-practice.md`](./rules/general/documentation-practice.md) R002, this file
+  points there instead of keeping a second copy that can drift again. `--output-type mermaid`
+  (`pnpm architecture` supports it as a flag) also emits a dependency graph worth putting in the
+  PR._
 
 ---
 

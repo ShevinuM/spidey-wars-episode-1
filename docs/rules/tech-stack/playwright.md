@@ -34,6 +34,7 @@ v2's locator-ranking rules (`getByRole`/`getByTestId`/no-CSS-selector) do not ap
 ## Sources
 
 - `/microsoft/playwright`
-- https://github.com/microsoft/playwright/blob/main/docs/src/test-api/class-testproject.md — `threshold`/`maxDiffPixels`/`maxDiffPixelRatio` as independent options (R006)
+- https://github.com/microsoft/playwright/blob/main/docs/src/test-api/class-testproject.md — `threshold`/`maxDiffPixels`/`maxDiffPixelRatio` as independent options (R006); per-project `testMatch`/`testIgnore` and `use.baseURL` (R009)
+- https://github.com/microsoft/playwright/blob/main/docs/src/test-api/class-testconfig.md — top-level `webServer` accepts an array, one entry per server (R009)
 - https://github.com/microsoft/playwright/blob/main/docs/src/docker.md — pinned Docker image tags, baked-in browsers (R008)
 - https://github.com/microsoft/playwright/blob/main/docs/src/release-notes-js.md — browsers stopped auto-downloading on install as of 1.38 (R008)

@@ -14,7 +14,7 @@ The `Replay` format, the two runners that play it back, and why the corpus start
 
 ## Determinism and frame independence
 
-- [ ] **R005** A replay must produce an identical digest whether the sim is advanced 60 times at `1/60s` or driven through a single `stepTo(60)` call. A replay that only passes when single-stepped is masking state carried outside `World` — see `unit-testing.md` R006 for the underlying no-`Math.random`/no-`Date.now` rule this depends on.
+- [ ] **R005** A replay must produce an identical trajectory digest regardless of the delta sequence fed into `tick()` — 100 steps at 16.6ms and 60 steps at 27.7ms must agree, the same 144Hz-vs-60Hz guarantee `docs/architecture.md`'s `tick.test.ts` row asserts. A replay whose digest depends on the delta sequence is masking state carried outside `World` — see `unit-testing.md` R006 for the underlying no-`Math.random`/no-`Date.now` rule this depends on.
 
 ## Corpus status
 
