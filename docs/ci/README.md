@@ -130,3 +130,5 @@ build's user version on itch.
   permanent broth URL to use from CI, and what its zip contains.
 - [itch.io docs — pushing builds](https://itch.io/docs/butler/pushing.html) —
   `--userversion` supplies your own build number.
+
+<!-- Canary PR probe: opened to read the live check-run names, never merged. -->
