@@ -1,0 +1,16 @@
+{
+  "ignorePatterns": ["reference/**"],
+  "overrides": [
+    {
+      "files": ["src/sim/**/*.ts", "src/cutscene/**/*.ts", "src/config/**/*.ts"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": ["phaser", "phaser/*", "**/scenes/**", "**/ui/**", "**/test-hooks*"]
+          }
+        ]
+      }
+    }
+  ]
+}

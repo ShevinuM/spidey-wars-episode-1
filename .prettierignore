@@ -1,0 +1,15 @@
+dist/
+dist-test/
+coverage/
+node_modules/
+pnpm-lock.yaml
+public/fonts/**
+public/sprites/**
+test/visual/baselines/**
+reference/**
+ds-bundle/
+.claude/
+.remember/
+.memsearch/
+Tasks/
+results.sarif

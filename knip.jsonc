@@ -1,0 +1,12 @@
+{
+  "entry": ["src/main.ts", "scripts/*.ts"],
+  "project": ["src/**/*.ts", "scripts/**/*.ts", "test/**/*.ts"],
+  "ignore": [
+    "reference/**",
+    "Tasks/**",
+    ".claude/**",
+    ".remember/**",
+    ".memsearch/**",
+    "ds-bundle/**",
+  ],
+}
