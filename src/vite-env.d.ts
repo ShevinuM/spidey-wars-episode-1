@@ -1,9 +1,8 @@
 /// <reference types="vite/client" />
 
-interface ImportMetaEnv {
-  readonly VITE_TEST_HOOKS?: string;
-}
+declare const __TEST__: boolean;
 
 interface Window {
   __READY__?: boolean;
+  __TEST__?: import("./test-hooks.ts").TestHooks;
 }

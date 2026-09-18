@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { digest } from "./digest.ts";
-import { FIXED_DT, MAX_FRAME, step, tick } from "./tick.ts";
+import { FIXED_DT, MAX_FRAME, step, stepTo, tick } from "./tick.ts";
 import { newWorld } from "./world.ts";
 
 describe("tick frame independence", () => {
@@ -74,5 +74,26 @@ describe("step", () => {
     expect(w.step).toBe(1);
     step(w, FIXED_DT);
     expect(w.step).toBe(2);
+  });
+});
+
+describe("stepTo", () => {
+  it("advances the world until w.step equals n", () => {
+    const w = newWorld(1);
+    stepTo(w, 5);
+    expect(w.step).toBe(5);
+  });
+
+  it("is a no-op when the world is already at n", () => {
+    const w = newWorld(1);
+    stepTo(w, 5);
+    stepTo(w, 5);
+    expect(w.step).toBe(5);
+  });
+
+  it("throws a RangeError when n is behind the current step", () => {
+    const w = newWorld(1);
+    stepTo(w, 5);
+    expect(() => stepTo(w, 3)).toThrow(RangeError);
   });
 });

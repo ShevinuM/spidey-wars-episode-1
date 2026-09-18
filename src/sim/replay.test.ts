@@ -51,4 +51,34 @@ describe("runReplay", () => {
     const replay: Replay = { seed: 1, inputs: [[1.5, { t: "noop" }]], expected: EMPTY_EXPECTED };
     expect(() => runReplay(replay)).toThrow(/step/);
   });
+
+  it("rejects a duplicate input step instead of silently keeping the last one", () => {
+    const replay: Replay = {
+      seed: 1,
+      inputs: [
+        [3, { t: "noop" }],
+        [3, { t: "noop" }],
+      ],
+      expected: EMPTY_EXPECTED,
+    };
+    expect(() => runReplay(replay)).toThrow(/duplicate/);
+  });
+
+  it("applies an input keyed to step 0 before any transition, so it is reachable", () => {
+    const replay = {
+      seed: 1,
+      inputs: [[0, { t: "bogus" }]],
+      expected: EMPTY_EXPECTED,
+    } as unknown as Replay;
+    expect(() => runReplay(replay)).toThrow(/at step 0/);
+  });
+
+  it("applies an input keyed to step s while w.step === s, not s - 1", () => {
+    const replay = {
+      seed: 1,
+      inputs: [[3, { t: "bogus" }]],
+      expected: EMPTY_EXPECTED,
+    } as unknown as Replay;
+    expect(() => runReplay(replay)).toThrow(/at step 3/);
+  });
 });

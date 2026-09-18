@@ -1,7 +1,8 @@
 import Phaser from "phaser";
 import { BootScene } from "./scenes/BootScene.ts";
+import { installTestHooks } from "./test-hooks.ts";
 
-new Phaser.Game({
+const game = new Phaser.Game({
   type: Phaser.AUTO,
   width: 1280,
   height: 720,
@@ -13,3 +14,7 @@ new Phaser.Game({
   },
   scene: [BootScene],
 });
+
+if (__TEST__) {
+  installTestHooks(game);
+}

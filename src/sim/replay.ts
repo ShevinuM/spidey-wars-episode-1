@@ -22,17 +22,26 @@ function assertValidReplay(replay: Replay): void {
   if (!Number.isFinite(replay.seed)) {
     throw new Error("malformed replay: seed must be a finite number");
   }
+  const seenSteps = new Set<number>();
   for (const [inputStep] of replay.inputs) {
     if (!Number.isInteger(inputStep) || inputStep < 0) {
       throw new Error(`malformed replay: input step ${inputStep} must be a non-negative integer`);
     }
+    if (seenSteps.has(inputStep)) {
+      throw new Error(`malformed replay: duplicate input at step ${inputStep}`);
+    }
+    seenSteps.add(inputStep);
   }
 }
 
-function applyAction(action: Action): void {
+function applyAction(world: World, action: Action): void {
   switch (action.t) {
     case "noop":
       return;
+    default:
+      throw new Error(
+        `malformed replay: unknown action ${JSON.stringify(action)} at step ${world.step}`,
+      );
   }
 }
 
@@ -42,14 +51,16 @@ export function runReplay(replay: Replay): ReplayResult {
   const actionsByStep = new Map(replay.inputs);
   const totalSteps = replay.inputs.reduce((max, [inputStep]) => Math.max(max, inputStep), 0);
   const trajectory: string[] = [];
-  for (let n = 1; n <= totalSteps; n += 1) {
-    const action = actionsByStep.get(n);
+  for (let s = 0; s <= totalSteps; s += 1) {
+    const action = actionsByStep.get(s);
     if (action !== undefined) {
-      applyAction(action);
+      applyAction(world, action);
     }
-    step(world, FIXED_DT);
-    if (world.step % TRAJECTORY_INTERVAL === 0) {
-      trajectory.push(digest(world));
+    if (s < totalSteps) {
+      step(world, FIXED_DT);
+      if (world.step % TRAJECTORY_INTERVAL === 0) {
+        trajectory.push(digest(world));
+      }
     }
   }
   return { world, digest: digest(world), trajectory };

@@ -6,4 +6,5 @@ export default defineConfig(({ mode }) => ({
     outDir: mode === "test" ? "dist-test" : "dist",
     sourcemap: mode === "test",
   },
+  define: { __TEST__: JSON.stringify(mode === "test") },
 }));

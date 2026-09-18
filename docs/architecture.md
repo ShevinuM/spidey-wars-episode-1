@@ -309,19 +309,37 @@ the physics moved.
 
 ### `__TEST__` hook and the two-build rule
 
-Driving the game deterministically needs an API the shipped game must not have:
+Driving the game deterministically needs an API the shipped game must not have. The flag is
+wired through Vite's `define`, which replaces the identifier with a literal at build time in
+both builds — that is what lets the gated block tree-shake out of `dist/` entirely:
 
 ```ts
-// src/test-hooks.ts — tree-shaken out entirely when the flag is unset
-if (import.meta.env.VITE_TEST_HOOKS) {
-  window.__TEST__ = { ready, stepTo, replay, record, dump, freeze, state, digest, renderHud, goto };
+// vite.config.ts
+export default defineConfig(({ mode }) => ({
+  define: { __TEST__: JSON.stringify(mode === "test") },
+}));
+```
+
+```ts
+// src/main.ts — game is the Phaser.Game instance just constructed
+import { installTestHooks } from "./test-hooks.ts";
+
+if (__TEST__) {
+  installTestHooks(game); // assigns window.__TEST__
 }
 ```
 
-| Build        | Flag                | Used by                                  |
-| ------------ | ------------------- | ---------------------------------------- |
-| `dist/`      | —                   | the itch upload, and the boot smoke test |
-| `dist-test/` | `VITE_TEST_HOOKS=1` | replay specs, visual tiers, coverage     |
+`window.__TEST__` has ten members: `ready`, `goto`, `freeze`, `stepTo`, `state`, `digest`,
+`replay`, `record`, `dump`, `renderHud`. Seven exist as of phase 03 — `ready`, `goto`,
+`freeze`, `stepTo`, `state`, `digest`, `replay` — implemented in `src/test-hooks.ts` against a
+`World` the hooks construct themselves, since `GameScene` doesn't exist yet. `record`, `dump`
+and `renderHud` are not implemented: they need input capture and the HUD, neither of which
+exists yet, and land with the features they serve.
+
+| Build        | Flag                                            | Used by                                  |
+| ------------ | ----------------------------------------------- | ---------------------------------------- |
+| `dist/`      | `__TEST__` is `false`                           | the itch upload, and the boot smoke test |
+| `dist-test/` | `__TEST__` is `true` (`vite build --mode test`) | replay specs, visual tiers, coverage     |
 
 > Two builds means two guarantees. The smoke test verifies **the shipped artifact**; replay and
 > visual specs verify **the game logic** in a hooked build. Keeping the smoke test on real
