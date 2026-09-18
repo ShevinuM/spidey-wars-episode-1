@@ -1,0 +1,71 @@
+name: Deploy to itch.io
+
+# Tags only. itch.io channels are the published release, not a mirror of main — Pages
+# already serves every commit on main (deploy.yml). workflow_dispatch is for re-pushing a
+# tag whose upload failed.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-itch-${{ github.head_ref || github.sha }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # Inert until the ITCH_TARGET repository variable is set to `user/game:channel`. A tag
+  # pushed before the itch project exists skips this job rather than failing it — there is
+  # nothing for a red run to tell anyone at that point. Setting the variable is what turns
+  # the workflow on; the ITCH_API_KEY secret must be set at the same time.
+  deploy-itch:
+    name: deploy-itch
+    if: vars.ITCH_TARGET != ''
+    runs-on: ubuntu-latest
+    env:
+      # Read into the shell through the environment rather than interpolated into a `run:`
+      # body — an expression pasted straight into a script is a command-injection hole,
+      # and codeql.yml's `actions` language flags it.
+      ITCH_TARGET: ${{ vars.ITCH_TARGET }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "26"
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+        env:
+          LEFTHOOK: "0"
+
+      # The tag is built here rather than downloaded from deploy.yml's Pages artifact:
+      # that artifact is retained for a fixed window and this workflow must be re-runnable
+      # for an old tag long after it expires.
+      - run: pnpm build
+
+      # broth is itch.io's automation endpoint; the LATEST URL is permanent and always
+      # serves the current stable butler. It is the one download in this repo pinned to
+      # neither a SHA nor a checksum — LATEST is a moving target by definition — so the
+      # version check below is what proves the download is a working binary rather than an
+      # error page. The zip also carries two 7-zip libraries butler loads from its own
+      # directory; `butler push` does not need them, and extracting them costs nothing.
+      - name: Install butler
+        run: |
+          curl -fsSL -o butler.zip https://broth.itch.zone/butler/linux-amd64/LATEST/archive/default
+          unzip -o butler.zip
+          chmod +x butler
+          ./butler -V
+
+      # --userversion is spelled lower-case; butler's flag parser is case-sensitive and
+      # --userVersion is rejected. GITHUB_REF_NAME is the tag name on a tag push, so the
+      # itch build number is the release tag — dispatch this workflow with `--ref <tag>`,
+      # never from a branch, or the build is versioned after the branch instead.
+      - name: Push the build to itch.io
+        env:
+          BUTLER_API_KEY: ${{ secrets.ITCH_API_KEY }}
+        run: ./butler push dist "$ITCH_TARGET" --userversion "$GITHUB_REF_NAME"

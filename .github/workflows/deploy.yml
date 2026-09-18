@@ -1,0 +1,80 @@
+name: Deploy
+
+# Only main publishes. Every commit that reaches main has already been through ci.yml on
+# its pull request, so this workflow builds and publishes rather than re-checking.
+# workflow_dispatch exists for the case where the build was fine and the Pages deployment
+# itself failed — re-publishing the same commit should not need an empty commit.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # actions/configure-pages reads the repository's Pages settings through
+      # GET /repos/{owner}/{repo}/pages. Read is enough: the site already exists
+      # (has_pages: true, build_type: workflow) and the action's `enablement` input is
+      # left at its default of false, so it never attempts to create one.
+      pages: read
+    # A newer push supersedes a build still in flight. Unlike the publish job below, a
+    # cancelled build leaves nothing half-finished.
+    concurrency:
+      group: deploy-${{ github.head_ref || github.sha }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "26"
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+        env:
+          # package.json's prepare script runs `lefthook install`; CI has no git hooks to
+          # install and this job runs no git commands past the checkout.
+          LEFTHOOK: "0"
+
+      # This is the production build, and dist is what ships. `pnpm build:test` writes
+      # dist-test instead, so anything added between here and the upload must leave dist
+      # alone. vite.config.ts's `base: './'` is what makes the same dist serve correctly
+      # under the /spidey-wars-episode-1/ prefix here and from a zip on itch.
+      - run: pnpm build
+
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: dist
+
+  deploy:
+    name: deploy
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # deploy-pages creates the deployment; id-token lets GitHub verify through OIDC
+      # that it came from this workflow run.
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    # Publishing is deliberately never cancelled mid-flight: a cancelled deployment can
+    # leave Pages serving a half-updated site. Queued runs wait their turn instead.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
