@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { FLOW } from "../config/flow.ts";
 import { TITLE_PLAQUE_SLICE } from "../config/tuning.ts";
 import { COLORS } from "../ui/colors.ts";
 import { createPressPlaque } from "../ui/press-plaque.ts";
@@ -61,7 +62,9 @@ export class TitleScene extends Phaser.Scene {
 
     this.add.image(0, 0, "crt").setOrigin(0, 0).setDepth(10);
 
-    this.input.once(Phaser.Input.Events.POINTER_DOWN, () => this.scene.restart());
+    this.input.once(Phaser.Input.Events.POINTER_DOWN, () =>
+      this.scene.start("CutsceneScene", { id: FLOW[0] }),
+    );
   }
 
   private buildTitleBlock(): void {
