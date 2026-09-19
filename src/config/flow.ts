@@ -1,12 +1,17 @@
 import type { Beat } from "../cutscene/script.ts";
 import { demo } from "./cutscenes/demo.ts";
 import { scene11 } from "./cutscenes/scene-1-1.ts";
+import { scene12 } from "./cutscenes/scene-1-2.ts";
 
 /** One `Beat[]` script per cutscene id, keyed for a static lookup by id. */
-export const CUTSCENES: Record<string, readonly Beat[]> = { demo, "scene-1-1": scene11 };
+export const CUTSCENES: Record<string, readonly Beat[]> = {
+  demo,
+  "scene-1-1": scene11,
+  "scene-1-2": scene12,
+};
 
 /** Playback order of cutscene ids. */
-export const FLOW: readonly string[] = ["scene-1-1"];
+export const FLOW: readonly string[] = ["scene-1-1", "scene-1-2"];
 
 /**
  * The cutscene id that follows `id` in `FLOW`, or `null` once `id` is the last one.

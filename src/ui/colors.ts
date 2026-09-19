@@ -94,4 +94,6 @@ export const COLORS = {
   acUnitHighlight: 0x3a5c9e,
   // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:86,88` the antenna pole and its cap.
   antennaPole: 0x2a4076,
+  // `reference/design/Scene 1.2 - MJ rejects Goblin.dc.html:108` the Goblin's sad tear.
+  tearBlue: 0x6fd1ff,
 } as const;
