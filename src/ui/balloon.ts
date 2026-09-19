@@ -75,9 +75,9 @@ const LINE_HEIGHT: Record<RunStyle, number> = {
 // `reference/design/Scene 2.1 - Spider-Sense.dc.html:130` `gap: 13px` between the balloon's paragraphs.
 const PARAGRAPH_GAP = 13;
 
-// The baked font's own pixel size. CSS `line-height` centres the glyph box within the line box, so a
-// segment's `BitmapText` is offset down from `PlacedSegment.y` (a row top) by
-// `round((rowHeight - FONT_PIXEL_SIZE) / 2)` to match.
+// The baked font's own pixel size, used to offset a segment's `BitmapText` down from `PlacedSegment.y`
+// (a row top) by `round((rowHeight - FONT_PIXEL_SIZE) / 2)` so it matches the glyph-box centring that
+// CSS `line-height` applies within the line box.
 const FONT_PIXEL_SIZE = 16;
 
 // Same line's inner-frame `padding: 17px 18px 19px` (top / left&right / bottom), added to the baked
@@ -256,10 +256,10 @@ export function createBalloon(scene: Phaser.Scene, options: BalloonOptions): Bal
   });
   container.add(frame);
 
-  // `Scene 2.1:130-135` — the tail div is a sibling that FOLLOWS the bordered inner div in DOM
-  // order, so it paints above the frame: its inner half covers the paper padding and the 3px
-  // frame border. Drawn below the frame, the frame's line would run straight across the tail's
-  // base and the balloon would read as closed.
+  // `Scene 2.1:130-135` — the tail div is a sibling that FOLLOWS the bordered inner div in DOM order
+  // and so paints above the frame, its inner half covering the paper padding and the 3px frame border,
+  // whereas a tail drawn below the frame would have the frame's line run straight across its base and
+  // the balloon read as closed.
   const tailGraphics = scene.add.graphics();
   drawTail(tailGraphics, x, y, width, height, tail);
   container.add(tailGraphics);
