@@ -1,6 +1,6 @@
 export type Speaker = "SPIDEY" | "MJ" | "GOBLIN";
 export type RunStyle = "body" | "bold" | "shout" | "muted";
-type RunAccent = "red" | "purple" | "blue";
+export type RunAccent = "red" | "purple" | "blue";
 
 export interface Run {
   readonly text: string;
@@ -8,7 +8,7 @@ export interface Run {
   readonly accent?: RunAccent;
 }
 
-interface Line {
+export interface Line {
   readonly runs: readonly Run[];
 }
 

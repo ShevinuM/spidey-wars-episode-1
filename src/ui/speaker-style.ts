@@ -2,7 +2,7 @@ import type { Speaker } from "../cutscene/script.ts";
 import { COLORS } from "./colors.ts";
 
 /** Per-speaker palette: the balloon's inner border colour and the name tag's fill, ring, dot, text and letter-spacing. */
-export interface SpeakerStyle {
+interface SpeakerStyle {
   readonly frameColor: number;
   readonly tagFill: number;
   readonly tagRing: number;
