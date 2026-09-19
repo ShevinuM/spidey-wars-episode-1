@@ -75,6 +75,11 @@ const LINE_HEIGHT: Record<RunStyle, number> = {
 // `reference/design/Scene 2.1 - Spider-Sense.dc.html:130` `gap: 13px` between the balloon's paragraphs.
 const PARAGRAPH_GAP = 13;
 
+// The baked font's own pixel size. CSS `line-height` centres the glyph box within the line box, so a
+// segment's `BitmapText` is offset down from `PlacedSegment.y` (a row top) by
+// `round((rowHeight - FONT_PIXEL_SIZE) / 2)` to match.
+const FONT_PIXEL_SIZE = 16;
+
 // Same line's inner-frame `padding: 17px 18px 19px` (top / left&right / bottom), added to the baked
 // ink+paper+frame band (`BALLOON_BORDER + BALLOON_PAD + BALLOON_INNER_BORDER`) to find the text box.
 const FRAME_BAND = BALLOON_BORDER + BALLOON_PAD + BALLOON_INNER_BORDER;
@@ -235,10 +240,6 @@ export function createBalloon(scene: Phaser.Scene, options: BalloonOptions): Bal
     .setOrigin(0, 0);
   container.add(nineSlice);
 
-  const tailGraphics = scene.add.graphics();
-  drawTail(tailGraphics, x, y, width, height, tail);
-  container.add(tailGraphics);
-
   // Overdraws the baked band in the speaker's own colour; `frameInset` must stay under
   // `BALLOON_SLICE.corner` or the bake starts stretching underneath it.
   const frameInset = BALLOON_BORDER + BALLOON_PAD;
@@ -255,18 +256,35 @@ export function createBalloon(scene: Phaser.Scene, options: BalloonOptions): Bal
   });
   container.add(frame);
 
+  // `Scene 2.1:130-135` — the tail div is a sibling that FOLLOWS the bordered inner div in DOM
+  // order, so it paints above the frame: its inner half covers the paper padding and the 3px
+  // frame border. Drawn below the frame, the frame's line would run straight across the tail's
+  // base and the balloon would read as closed.
+  const tailGraphics = scene.add.graphics();
+  drawTail(tailGraphics, x, y, width, height, tail);
+  container.add(tailGraphics);
+
   const textOriginX = x + TEXT_INSET_X;
   const textOriginY = y + TEXT_INSET_TOP;
   const rendered: RenderedSegment[] = [];
   let charOffset = 0;
   for (const placedLine of layout.lines) {
+    // Segments sharing a `PlacedSegment.y` share a row (within this Line's own `flowRuns` call);
+    // the row's height is the max `LINE_HEIGHT` over the styles in it.
+    const rowHeights = new Map<number, number>();
+    for (const seg of placedLine.segments) {
+      rowHeights.set(seg.y, Math.max(rowHeights.get(seg.y) ?? 0, LINE_HEIGHT[seg.style]));
+    }
     for (const seg of placedLine.segments) {
       const run: Run = placedLine.line.runs[seg.runIndex];
       const tint = run.accent ? ACCENT_TINT[run.accent] : STYLE_TINT[seg.style];
+      // Populated above from this same `placedLine.segments` array, so the key is always present.
+      const rowHeight = rowHeights.get(seg.y)!;
+      const centerOffset = Math.round((rowHeight - FONT_PIXEL_SIZE) / 2);
       const bmText = scene.add
         .bitmapText(
           textOriginX + seg.x,
-          textOriginY + placedLine.top + seg.y,
+          textOriginY + placedLine.top + seg.y + centerOffset,
           FONT_OF[seg.style],
           seg.text,
         )
