@@ -488,6 +488,167 @@ function frownMouth(
   return { tweens: [] };
 }
 
+// `reference/design/Scene 1.3 - Goblin Gets Triggered.dc.html:106-108` the Goblin's wide cackling mouth — a 24x18 box (radii 6/6/12/12), a 20x4 tooth strip, and a 3x6 tongue, all static.
+const CACKLE_MOUTH_LEFT = 55;
+const CACKLE_MOUTH_TOP = 44;
+const CACKLE_MOUTH_W = 24;
+const CACKLE_MOUTH_H = 18;
+const CACKLE_TEETH_LEFT = 57;
+const CACKLE_TEETH_TOP = 47;
+const CACKLE_TEETH_W = 20;
+const CACKLE_TEETH_H = 4;
+const CACKLE_TONGUE_LEFT = 61;
+const CACKLE_TONGUE_TOP = 53;
+const CACKLE_TONGUE_W = 3;
+const CACKLE_TONGUE_H = 6;
+
+function cackleMouth(
+  scene: Phaser.Scene,
+  container: Phaser.GameObjects.Container,
+  sprite: Phaser.GameObjects.Image,
+): EffectHandle {
+  const [mouthX, mouthY] = localOf(sprite, CACKLE_MOUTH_LEFT, CACKLE_MOUTH_TOP);
+  const g = scene.add.graphics();
+  g.fillStyle(COLORS.ink, 1);
+  g.fillRoundedRect(mouthX, mouthY, CACKLE_MOUTH_W, CACKLE_MOUTH_H, {
+    tl: 6,
+    tr: 6,
+    bl: 12,
+    br: 12,
+  });
+  container.add(g);
+
+  const [teethX, teethY] = localOf(sprite, CACKLE_TEETH_LEFT, CACKLE_TEETH_TOP);
+  container.add(
+    scene.add
+      .rectangle(teethX, teethY, CACKLE_TEETH_W, CACKLE_TEETH_H, COLORS.paper)
+      .setOrigin(0, 0),
+  );
+
+  const [tongueX, tongueY] = localOf(sprite, CACKLE_TONGUE_LEFT, CACKLE_TONGUE_TOP);
+  container.add(
+    scene.add.ellipse(
+      tongueX + CACKLE_TONGUE_W / 2,
+      tongueY + CACKLE_TONGUE_H / 2,
+      CACKLE_TONGUE_W,
+      CACKLE_TONGUE_H,
+      COLORS.kissMouth,
+    ),
+  );
+  return { tweens: [] };
+}
+
+interface FallingTear {
+  readonly left: number;
+  readonly delayMs: number;
+}
+
+// `reference/design/Scene 1.3 - Goblin Gets Triggered.dc.html:93-94` MJ's two tears, 4x7 at top 47, left 48/68 — the fill colour matches `COLORS.frameBlue`'s hex.
+const TEAR_FALL_TOP = 47;
+const TEAR_FALL_W = 4;
+const TEAR_FALL_H = 7;
+const TEAR_FALL_AMOUNT = 16;
+const TEAR_FALL_SCALE_FROM = 0.6;
+const TEAR_FALL_ALPHA_FROM = 0;
+const TEAR_FALL_DURATION_MS = 1400;
+const TEAR_FALLS: readonly FallingTear[] = [
+  { left: 48, delayMs: 0 },
+  { left: 68, delayMs: 500 }, // `...:94` `animation-delay: .5s` on the second tear.
+];
+
+function tearFall(
+  scene: Phaser.Scene,
+  container: Phaser.GameObjects.Container,
+  sprite: Phaser.GameObjects.Image,
+): EffectHandle {
+  const tweens: Phaser.Tweens.Tween[] = [];
+  for (const tear of TEAR_FALLS) {
+    const [x, y] = localOf(sprite, tear.left + TEAR_FALL_W / 2, TEAR_FALL_TOP + TEAR_FALL_H / 2);
+    const drop = scene.add
+      .ellipse(x, y, TEAR_FALL_W, TEAR_FALL_H, COLORS.frameBlue)
+      .setScale(1, TEAR_FALL_SCALE_FROM)
+      .setAlpha(TEAR_FALL_ALPHA_FROM);
+    container.add(drop);
+    tweens.push(
+      scene.tweens.add({
+        targets: drop,
+        y: drop.y + TEAR_FALL_AMOUNT,
+        scaleY: 1,
+        alpha: 1,
+        duration: TEAR_FALL_DURATION_MS,
+        delay: tear.delayMs,
+        yoyo: true,
+        repeat: -1,
+        ease: steppedEase(DEFAULT_STEPS),
+      }),
+    );
+  }
+  return { tweens };
+}
+
+interface HaSpan {
+  readonly left: number;
+  readonly top: number;
+  readonly fontKey: "pressstart-16" | "pressstart-8";
+  readonly delayMs: number;
+}
+
+// `reference/design/Scene 1.3 - Goblin Gets Triggered.dc.html:110-111` two "HA" spans, Press Start 2P at 13px and 11px — the nearest baked bitmap fonts are `pressstart-16` and `pressstart-8`, since a fractional scale would sample unevenly under `pixelArt: true`.
+const HA_SPANS: readonly HaSpan[] = [
+  { left: 96, top: 6, fontKey: "pressstart-16", delayMs: 0 },
+  { left: -18, top: 20, fontKey: "pressstart-8", delayMs: 500 }, // `...:111` `animation-delay: .5s`.
+];
+const HA_SHADOW_OFFSET = 2; // `...:110` `text-shadow: 2px 2px 0 #7b2fbe`.
+const HA_SCALE_FROM = 0.6;
+const HA_SCALE_TO = 1.2;
+const HA_DX = 18;
+const HA_DY = -30;
+const HA_ALPHA_FROM = 0;
+const HA_DURATION_MS = 1600;
+
+function haFloat(
+  scene: Phaser.Scene,
+  container: Phaser.GameObjects.Container,
+  sprite: Phaser.GameObjects.Image,
+): EffectHandle {
+  const tweens: Phaser.Tweens.Tween[] = [];
+  for (const span of HA_SPANS) {
+    const [left, top] = localOf(sprite, span.left, span.top);
+    const main = scene.add.bitmapText(0, 0, span.fontKey, "HA");
+    const cx = left + main.width / 2;
+    const cy = top + main.height / 2;
+    const shadow = scene.add
+      .bitmapText(cx + HA_SHADOW_OFFSET, cy + HA_SHADOW_OFFSET, span.fontKey, "HA")
+      .setOrigin(0.5, 0.5)
+      .setTint(COLORS.purple)
+      .setScale(HA_SCALE_FROM)
+      .setAlpha(HA_ALPHA_FROM);
+    main
+      .setPosition(cx, cy)
+      .setOrigin(0.5, 0.5)
+      .setTint(COLORS.textGoblin)
+      .setScale(HA_SCALE_FROM)
+      .setAlpha(HA_ALPHA_FROM);
+    container.add(shadow);
+    container.add(main);
+    tweens.push(
+      scene.tweens.add({
+        targets: [shadow, main],
+        x: `+=${HA_DX}`,
+        y: `+=${HA_DY}`,
+        scale: HA_SCALE_TO,
+        alpha: 1,
+        duration: HA_DURATION_MS,
+        delay: span.delayMs,
+        yoyo: true,
+        repeat: -1,
+        ease: steppedEase(DEFAULT_STEPS),
+      }),
+    );
+  }
+  return { tweens };
+}
+
 const RECIPES: Record<string, Recipe> = {
   bob,
   droop,
@@ -503,6 +664,9 @@ const RECIPES: Record<string, Recipe> = {
   "flying-kiss": flyingKiss,
   bouquet,
   "floating-hearts": floatingHearts,
+  "cackle-mouth": cackleMouth,
+  "tear-fall": tearFall,
+  "ha-float": haFloat,
 };
 
 /**
