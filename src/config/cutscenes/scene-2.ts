@@ -1,9 +1,21 @@
-import type { Beat } from "../../cutscene/script.ts";
+import type { ActorPlacement, Beat } from "../../cutscene/script.ts";
+
+const SPIDEY: ActorPlacement = {
+  frame: "spidey-side-new",
+  // `Scene 2 - Rooftop Relief.dc.html:83` his wrapper's rendered centre is screen x 738.35, which is 723 inside the play area's own 15px inset, and omitting `y` leaves his feet on the backdrop's ground line.
+  x: 723,
+  // `Scene 2 - Rooftop Relief.dc.html:40,84` the 0.82-zoom stage renders his 208x400 `<img>` at 170.5x328, or 6.56 of `spidey-side-new`'s 26x50 atlas frame, rounded because a fractional scale samples unevenly under `pixelArt: true`.
+  scale: 7,
+  tag: "SPIDEY",
+  tagAt: { dx: 28, dy: -25 }, // `Scene 2 - Rooftop Relief.dc.html:88` `left: 34px; top: -30px`, at the stage's 0.82 zoom.
+  // `Scene 2 - Rooftop Relief.dc.html:84-97` in DOM order — the shiver is on the `<img>`, then the shadow, then the arc.
+  effects: ["shiver", "feet-shadow", "stream-arc"],
+};
 
 export const scene2: readonly Beat[] = [
   {
     bg: "scene-2",
-    actors: [],
+    actors: [SPIDEY],
     speaker: "SPIDEY",
     // `reference/design/Scene 2 - Rooftop Relief.dc.html:107-109` — three paragraphs, so three lines.
     lines: [

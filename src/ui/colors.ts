@@ -110,4 +110,6 @@ export const COLORS = {
   roofSlabSeamDark: 0x000000,
   // `reference/design/Scene 2 - Rooftop Relief.dc.html:78` the slab's shadowed edge face at the ledge.
   roofSlabEdge: 0x0c1630,
+  // `reference/design/Scene 2 - Rooftop Relief.dc.html:97` the arc stream's dot fill.
+  streamDrop: 0xf6fbff,
 } as const;
