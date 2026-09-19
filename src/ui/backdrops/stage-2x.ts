@@ -25,11 +25,7 @@ interface StageClip {
   readonly bottom: number;
 }
 
-/**
- * `reference/design/Scene 2 - Rooftop Relief.dc.html:40` — the stage wrapper's `zoom`, which Scenes 2 and 2.1 both run at.
- *
- * It scales an overlay's width and height as much as its offsets, not only where the overlay sits.
- */
+/** `reference/design/Scene 2 - Rooftop Relief.dc.html:40` — the stage wrapper's `zoom`, which Scenes 2 and 2.1 both run at. */
 export const STAGE_2X_ZOOM = 0.82;
 
 /** Play-area x of a stage-local `left:` offset, rounded so a fill lands on whole pixels. */
