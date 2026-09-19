@@ -68,6 +68,8 @@ const FAR_GAP = 8;
 const FAR_ALPHA = 0.75;
 
 // `reference/design/Scene 2 - Rooftop Relief.dc.html:50-53` mid skyline: 18 buildings from stage-local -120, 14px gaps, a 3px `border-top` edge cap.
+// That div sets no `box-sizing`, so the cap sits above its `height:` rather than inside it.
+// A CSS border snaps to whole device pixels, so the cap is drawn `round(MID_EDGE_CAP * zoom)` device px thick, converted back to stage units.
 const MID_COUNT = 18;
 const MID_LEFT = -120;
 const MID_GAP = 14;
@@ -121,9 +123,10 @@ function midBuildings(rand: () => number): MidBuilding[] {
 /**
  * Fills the lit windows of one mid building, in stage-local px.
  *
- * `dx`/`dy` are measured from the building's own top-left because that is where the mockup's
- * `background-position` phase is anchored, and both loops start a whole tile early so the cell straddling
- * that corner is not skipped.
+ * `dx`/`dy` are measured from the top-left of the building's padding box — the corner `b.h` above its
+ * bottom — because `background-origin` defaults to `padding-box`, which is where the mockup anchors its
+ * `background-position` phase. Both loops start a whole tile early so the cell straddling that corner is
+ * not skipped.
  */
 function drawWindowGrid(
   g: Phaser.GameObjects.Graphics,
@@ -173,13 +176,14 @@ function drawMidSkyline(
   buildings: readonly MidBuilding[],
   stage: Stage2x,
 ): void {
+  const capDevicePx = Math.round(MID_EDGE_CAP * stage.zoom);
   let cx = MID_LEFT;
   for (const b of buildings) {
     g.fillStyle(COLORS.buildingMid, 1);
     stageFill(g, stage, cx, 0, b.w, b.h);
     drawWindowGrid(g, stage, cx, 0, b);
     g.fillStyle(COLORS.buildingEdge, 1);
-    stageFill(g, stage, cx, b.h - MID_EDGE_CAP, b.w, MID_EDGE_CAP);
+    stageFill(g, stage, cx, b.h, b.w, capDevicePx / stage.zoom);
     cx += b.w + MID_GAP;
   }
 }
