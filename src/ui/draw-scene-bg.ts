@@ -1,5 +1,5 @@
 import type Phaser from "phaser";
-import { drawDemoBackdrop } from "./backdrops/demo.ts";
+import { DEMO_GROUND_FROM_BOTTOM, drawDemoBackdrop } from "./backdrops/demo.ts";
 import { COLORS } from "./colors.ts";
 import { octagon } from "./primitives.ts";
 
@@ -17,13 +17,32 @@ type BackdropDrawer = (
   h: number,
 ) => void;
 
+interface Backdrop {
+  readonly draw: BackdropDrawer;
+  /** Play-area y of the surface actors stand on. */
+  readonly groundY: number;
+}
+
 /**
- * One entry per scene id, each backed by one file under `backdrops/`. Adding a backdrop means adding that
- * file and one line here — nothing else in `drawSceneBg` or its callers changes.
+ * One entry per scene id, each backed by one file under `backdrops/`.
+ *
+ * Adding a backdrop means adding that file and one line here — nothing else in `drawSceneBg`,
+ * `groundYOf`, or their callers changes. A backdrop file exports its ground line measured up from the
+ * play area's own bottom edge, since importing `PLAY_AREA` back from here would cycle; this registry is
+ * the one place that owns `PLAY_AREA.height` and converts that offset into the from-top `groundY` stored
+ * below.
  */
-const BACKDROPS: Record<string, BackdropDrawer> = {
-  demo: drawDemoBackdrop,
+const BACKDROPS: Record<string, Backdrop> = {
+  demo: { draw: drawDemoBackdrop, groundY: PLAY_AREA.height - DEMO_GROUND_FROM_BOTTOM },
 };
+
+function backdropOf(id: string, caller: string): Backdrop {
+  const backdrop = BACKDROPS[id];
+  if (!backdrop) {
+    throw new Error(`${caller}: no backdrop registered for id "${id}"`);
+  }
+  return backdrop;
+}
 
 /**
  * Draws the three nested octagon frame panels at 1280×720 (`reference/design/Scene 2.1 - Spider-Sense.dc.html:28-30`),
@@ -35,9 +54,19 @@ export function drawSceneBg(g: Phaser.GameObjects.Graphics, id: string): void {
   octagon(g, 4, 4, 1272, 712, 9, COLORS.frameDeep);
   octagon(g, 12, 12, 1256, 696, 0, COLORS.frameMid);
 
-  const draw = BACKDROPS[id];
-  if (!draw) {
-    throw new Error(`drawSceneBg: no backdrop registered for id "${id}"`);
-  }
-  draw(g, PLAY_AREA.x, PLAY_AREA.y, PLAY_AREA.width, PLAY_AREA.height);
+  backdropOf(id, "drawSceneBg").draw(
+    g,
+    PLAY_AREA.x,
+    PLAY_AREA.y,
+    PLAY_AREA.width,
+    PLAY_AREA.height,
+  );
+}
+
+/**
+ * The play-area y of `id`'s ground line, throwing if `id` has no registered backdrop exactly as
+ * `drawSceneBg` does.
+ */
+export function groundYOf(id: string): number {
+  return backdropOf(id, "groundYOf").groundY;
 }

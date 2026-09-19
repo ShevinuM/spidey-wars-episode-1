@@ -69,3 +69,44 @@ export const CRT_VIGNETTE_RINGS = 30;
 
 /** Prompt blink half-period, ms — `reference/design/Scene 2 - Rooftop Relief.dc.html`'s `animation: blink 0.9s steps(1, end)`, halved for a hard visible/hidden toggle. */
 export const BLINK_MS = 450;
+
+type SpriteFrame =
+  | "bat"
+  | "goblin"
+  | "goblin-hover"
+  | "mj"
+  | "mj-falling"
+  | "mj-standing"
+  | "mj-standing-angry"
+  | "mj-standing-crying"
+  | "spider"
+  | "spidey"
+  | "spidey-crouch"
+  | "spidey-side"
+  | "spidey-side-new"
+  | "spidey-v2";
+
+/**
+ * Final on-screen scale by atlas frame name (`public/sprites/atlas.json`).
+ *
+ * `spider`'s 3 is only a default — the mockups vary it 3/2/1 by scene, and a placement overrides it.
+ * `spidey-crouch` sits inside a mockup stage wrapped at 0.66 zoom, and `spidey-side`/`spidey-side-new` at
+ * 0.82 zoom; fold that zoom into a placement's own scale the way `config/cutscenes/demo.ts` does for
+ * `spidey-side-new`, rather than looking for it in this table.
+ */
+export const SPRITE_SCALE: Record<SpriteFrame, number> = {
+  bat: 3,
+  goblin: 5,
+  "goblin-hover": 7,
+  mj: 5,
+  "mj-falling": 1,
+  "mj-standing": 6,
+  "mj-standing-angry": 6,
+  "mj-standing-crying": 6,
+  spider: 3,
+  spidey: 5,
+  "spidey-crouch": 10,
+  "spidey-side": 8,
+  "spidey-side-new": 8,
+  "spidey-v2": 5,
+};

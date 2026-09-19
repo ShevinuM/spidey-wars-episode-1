@@ -12,11 +12,16 @@ export interface Line {
   readonly runs: readonly Run[];
 }
 
-/** `x`/`y` are play-area pixels; the sprite is anchored bottom-centre at that point. */
-interface ActorPlacement {
+/**
+ * `x` is a play-area pixel; the sprite is anchored bottom-centre at that point.
+ *
+ * An omitted `y` means the actor stands on `bg`'s backdrop ground line; a given `y` is a play-area pixel
+ * the same way `x` is.
+ */
+export interface ActorPlacement {
   readonly frame: string;
   readonly x: number;
-  readonly y: number;
+  readonly y?: number;
   readonly scale?: number;
   readonly flipX?: boolean;
   readonly tag?: Speaker;

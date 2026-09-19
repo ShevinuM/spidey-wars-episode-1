@@ -28,12 +28,17 @@ const MID_EDGE_CAP = 3;
 const MID_WINDOW_SIZE = 4;
 const MID_WINDOW_GAP = 10;
 
-// Both skylines "extend to ground" (`:44`, `:51`) starting 80 px left of the backdrop's own left edge.
+// `reference/design/Scene 2.1 - Spider-Sense.dc.html:45` puts the far skyline at -80px and `:52` puts the
+// mid skyline at -120px; this backdrop deliberately collapses both to one shared 80px offset rather than
+// porting each separately.
 const SKYLINE_START_OFFSET = 80;
 
 // `reference/design/Scene 2.1 - Spider-Sense.dc.html:77-78` — the roof slab is 250 px tall with a 30 px cap on top.
 const ROOF_BAND_HEIGHT = 250;
 const ROOF_CAP_HEIGHT = 30;
+
+/** Px the ground line sits above the play area's own bottom edge — actors stand on the roof cap's top. */
+export const DEMO_GROUND_FROM_BOTTOM = ROOF_BAND_HEIGHT;
 
 interface Building {
   readonly w: number;
