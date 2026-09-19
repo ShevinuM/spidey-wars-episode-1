@@ -15,7 +15,7 @@ const SKY_GRADIENT: readonly GradientStop[] = [
 // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:183` — the mockup's own seed for this scene's stream.
 const SEED = 90613;
 
-// `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:184-187,197-202` — `renderVals()`'s draw order is far buildings (26 × 2 draws), then mid buildings (20 × 5 draws), then 46 stars (ruling 18).
+// `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:184-187,197-202` — `renderVals()`'s draw order is far buildings (26 × 2 draws), then mid buildings (20 × 5 draws), then 46 stars.
 
 // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:46-50` far skyline: 26 buildings, left offset 10px, 8px gaps, alpha .8.
 const FAR_COUNT = 26;
@@ -70,7 +70,7 @@ const ROOF_DECK_SHADOW_H = 4;
 const ROOF_DECK_CAP_TOP = 48;
 const ROOF_DECK_CAP_HEIGHT = 8;
 
-// `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:73-74` 17 parapet blocks (see `renderVals()`, not the `hint-placeholder-count="14"` on the element — ruling 18).
+// `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:73-74` 17 parapet blocks (see `renderVals()`, not the `hint-placeholder-count="14"` on the element).
 const PARAPET_COUNT = 17;
 const PARAPET_FIRST_LEFT = -14;
 const PARAPET_STEP = 38;
@@ -399,7 +399,7 @@ export function drawScene11Backdrop(
   g.fillStyle(COLORS.roofCap, 1);
   g.fillRect(heroLeft(222), heroY(-46), 30, 12);
 
-  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:86-88` antenna: pole, a baked-lit light (ruling 23 — the mockup's `blink` animation is baked "on"), and its cap.
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:86-88` antenna: pole, a baked-lit light (the mockup's `blink` animation is baked "on"), and its cap.
   g.fillStyle(COLORS.antennaPole, 1);
   g.fillRect(heroLeft(44), heroY(-132), 10, 140);
   g.fillStyle(COLORS.red, 1);
