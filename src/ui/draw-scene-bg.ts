@@ -24,8 +24,8 @@ interface Backdrop {
   readonly groundY: number;
 }
 
-// Scene 1.1 and 1.2's mockups draw byte-identical backdrops (stars, skylines, hero building, parapet,
-// rooftop props and antenna all match), so both ids point at this one baked `Backdrop`.
+// Scenes 1.1, 1.2 and 1.3's mockups draw byte-identical backdrops (stars, skylines, hero building,
+// parapet, rooftop props and antenna all match), so all three ids point at this one baked `Backdrop`.
 const ROOFTOP: Backdrop = {
   draw: drawScene11Backdrop,
   groundY: PLAY_AREA.height - SCENE_1_1_GROUND_FROM_BOTTOM,
@@ -45,6 +45,7 @@ const BACKDROPS: Record<string, Backdrop> = {
   demo: { draw: drawDemoBackdrop, groundY: PLAY_AREA.height - DEMO_GROUND_FROM_BOTTOM },
   "scene-1-1": ROOFTOP,
   "scene-1-2": ROOFTOP,
+  "scene-1-3": ROOFTOP,
 };
 
 function backdropOf(id: string, caller: string): Backdrop {
