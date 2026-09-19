@@ -161,9 +161,10 @@ export class CutsceneScene extends Phaser.Scene {
 
   /** Sets the current beat's elapsed steps absolutely (never accumulating) and syncs the visuals. */
   stepTo(n: number): void {
+    const stepper = newStepper();
+    setStepperStep(stepper, n);
     this.player = setPlayerStep(this.player, n);
-    this.stepper = newStepper();
-    setStepperStep(this.stepper, n);
+    this.stepper = stepper;
     this.sync();
   }
 

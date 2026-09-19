@@ -94,7 +94,7 @@ type SpriteFrame =
  * 0.82 zoom; fold that zoom into a placement's own scale the way `config/cutscenes/demo.ts` does for
  * `spidey-side-new`, rather than looking for it in this table.
  */
-export const SPRITE_SCALE: Record<SpriteFrame, number> = {
+export const SPRITE_SCALE = {
   bat: 3,
   goblin: 5,
   "goblin-hover": 7,
@@ -109,4 +109,4 @@ export const SPRITE_SCALE: Record<SpriteFrame, number> = {
   "spidey-side": 8,
   "spidey-side-new": 8,
   "spidey-v2": 5,
-};
+} as const satisfies Record<SpriteFrame, number>;

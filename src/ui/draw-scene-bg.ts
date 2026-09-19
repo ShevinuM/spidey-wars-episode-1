@@ -45,11 +45,16 @@ function backdropOf(id: string, caller: string): Backdrop {
 }
 
 /**
- * Draws the three nested octagon frame panels at 1280×720 (`reference/design/Scene 2.1 - Spider-Sense.dc.html:28-30`),
- * then the backdrop registered for `id` inside `PLAY_AREA`. Throws if `id` has no registered backdrop — a
- * missing backdrop is a bug to surface loudly, never a silently skipped draw.
+ * Fills 1280×720 with page background, then draws the three nested octagon frame panels (`reference/design/Scene 2.1 - Spider-Sense.dc.html:28-30`) and the backdrop registered for `id` inside `PLAY_AREA`.
+ *
+ * Throws if `id` has no registered backdrop — a missing backdrop is a bug to surface loudly, never a
+ * silently skipped draw.
  */
 export function drawSceneBg(g: Phaser.GameObjects.Graphics, id: string): void {
+  // Fills the full canvas with page background first so the outer octagon's corner cuts show `#060d22` rather than whatever scene is still resident underneath, matching `reference/design/Scene 2.1 - Spider-Sense.dc.html:15`'s `background: #060d22`.
+  g.fillStyle(COLORS.bgDeep, 1);
+  g.fillRect(0, 0, 1280, 720);
+
   octagon(g, 0, 0, 1280, 720, 10, COLORS.frameBlue);
   octagon(g, 4, 4, 1272, 712, 9, COLORS.frameDeep);
   octagon(g, 12, 12, 1256, 696, 0, COLORS.frameMid);
