@@ -32,4 +32,16 @@ export const COLORS = {
   towerSpidey: 0x1b2c5a,
   roofCap: 0x2c4784,
   textWarm: 0xffd7d5,
+  // `reference/design/Scene 2.1 - Spider-Sense.dc.html:133` the balloon's muted trailing paragraph text.
+  mutedInk: 0x4a3f2e,
+  // `reference/design/Scene 2.1 - Spider-Sense.dc.html:99` the SPIDEY name tag's fill.
+  tagSpidey: 0x0f1c3c,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:94` the MJ name tag's fill.
+  tagMj: 0x4a0f10,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:124` the GOBLIN name tag's fill.
+  tagGoblin: 0x2b0f4d,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:126` the GOBLIN name tag's text colour.
+  textGoblin: 0xd9b6ff,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:95` the MJ name tag's dot.
+  redSoft: 0xff8d86,
 } as const;

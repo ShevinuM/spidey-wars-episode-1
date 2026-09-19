@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import { BootScene } from "./scenes/BootScene.ts";
+import { CutsceneScene } from "./scenes/CutsceneScene.ts";
 import { TitleScene } from "./scenes/TitleScene.ts";
 import { installTestHooks } from "./test-hooks.ts";
 
@@ -13,7 +14,9 @@ const game = new Phaser.Game({
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [BootScene, TitleScene],
+  // Only the array's first entry auto-starts (phaser@4.2.1 `src/scene/SceneManager.js:165-171`,
+  // `Settings.js:45` defaults `active` to `false`), so `CutsceneScene` here is added, not started.
+  scene: [BootScene, TitleScene, CutsceneScene],
 });
 
 if (__TEST__) {
