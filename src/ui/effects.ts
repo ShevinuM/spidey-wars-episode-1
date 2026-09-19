@@ -363,13 +363,143 @@ function bouquet(
   return { tweens: [] };
 }
 
+// `reference/design/Scene 1.2 - MJ rejects Goblin.dc.html:99` `animation: droop 3.2s ease-in-out infinite` on the glider wrapper — rest pose rotate(3deg), dipping to translateY(5px) rotate(1deg).
+const DROOP_ROTATION_FROM_DEG = 3;
+const DROOP_ROTATION_TO_DEG = 1;
+const DROOP_TRANSLATE_Y = 5;
+const DROOP_DURATION_MS = 1600;
+
+function degToRad(deg: number): number {
+  return (deg * Math.PI) / 180;
+}
+
+function droop(scene: Phaser.Scene, container: Phaser.GameObjects.Container): EffectHandle {
+  container.setRotation(degToRad(DROOP_ROTATION_FROM_DEG));
+  const tween = scene.tweens.add({
+    targets: container,
+    y: container.y + DROOP_TRANSLATE_Y,
+    rotation: degToRad(DROOP_ROTATION_TO_DEG),
+    duration: DROOP_DURATION_MS,
+    yoyo: true,
+    repeat: -1,
+    ease: steppedEase(DEFAULT_STEPS),
+  });
+  return { tweens: [tween] };
+}
+
+// `reference/design/Scene 1.2 - MJ rejects Goblin.dc.html:102-103` two 12x2 brows, left 48/74, top 25, rotated 22deg and -22deg about their own centre.
+const SAD_EYEBROW_TOP = 25;
+const SAD_EYEBROW_W = 12;
+const SAD_EYEBROW_H = 2;
+const SAD_EYEBROWS: readonly (readonly [left: number, angleDeg: number])[] = [
+  [48, 22],
+  [74, -22],
+];
+
+function sadEyebrows(
+  scene: Phaser.Scene,
+  container: Phaser.GameObjects.Container,
+  sprite: Phaser.GameObjects.Image,
+): EffectHandle {
+  for (const [left, angleDeg] of SAD_EYEBROWS) {
+    const [x, y] = localOf(sprite, left + SAD_EYEBROW_W / 2, SAD_EYEBROW_TOP + SAD_EYEBROW_H / 2);
+    const brow = scene.add
+      .rectangle(x, y, SAD_EYEBROW_W, SAD_EYEBROW_H, COLORS.ink)
+      .setRotation(degToRad(angleDeg));
+    container.add(brow);
+  }
+  return { tweens: [] };
+}
+
+// `reference/design/Scene 1.2 - MJ rejects Goblin.dc.html:105-106` two 5px dots, left 55/76, top 34.
+const SAD_EYE_TOP = 34;
+const SAD_EYE_SIZE = 5;
+const SAD_EYE_LEFTS: readonly number[] = [55, 76];
+
+function sadEyes(
+  scene: Phaser.Scene,
+  container: Phaser.GameObjects.Container,
+  sprite: Phaser.GameObjects.Image,
+): EffectHandle {
+  for (const left of SAD_EYE_LEFTS) {
+    const [x, y] = localOf(sprite, left + SAD_EYE_SIZE / 2, SAD_EYE_TOP + SAD_EYE_SIZE / 2);
+    const eye = scene.add.ellipse(x, y, SAD_EYE_SIZE, SAD_EYE_SIZE, COLORS.ink);
+    container.add(eye);
+  }
+  return { tweens: [] };
+}
+
+// `reference/design/Scene 1.2 - MJ rejects Goblin.dc.html:108` the 4x6 tear, left 54, top 40, falling 14px as it fades in then out.
+const TEAR_LEFT = 54;
+const TEAR_TOP = 40;
+const TEAR_W = 4;
+const TEAR_H = 6;
+const TEAR_FALL = 14;
+const TEAR_ALPHA_FROM = 0;
+const TEAR_ALPHA_TO = 0.9;
+const TEAR_DURATION_MS = 2400;
+
+function tearDrip(
+  scene: Phaser.Scene,
+  container: Phaser.GameObjects.Container,
+  sprite: Phaser.GameObjects.Image,
+): EffectHandle {
+  const [x, y] = localOf(sprite, TEAR_LEFT + TEAR_W / 2, TEAR_TOP + TEAR_H / 2);
+  const drop = scene.add.ellipse(x, y, TEAR_W, TEAR_H, COLORS.tearBlue).setAlpha(TEAR_ALPHA_FROM);
+  container.add(drop);
+  const tween = scene.tweens.add({
+    targets: drop,
+    y: drop.y + TEAR_FALL,
+    alpha: TEAR_ALPHA_TO,
+    duration: TEAR_DURATION_MS,
+    yoyo: true,
+    repeat: -1,
+    ease: steppedEase(DEFAULT_STEPS),
+  });
+  return { tweens: [tween] };
+}
+
+// `reference/design/Scene 1.2 - MJ rejects Goblin.dc.html:110` a 16x8 box, border-top only, top corners rounded 50% — its endpoints (0,4)/(16,4) and apex (8,0) sit on a radius-10 circle centred ten px below the box's top edge.
+const FROWN_LEFT = 59;
+const FROWN_TOP = 50;
+const FROWN_W = 16;
+const FROWN_RADIUS = 10;
+const FROWN_HALF_ANGLE = Math.asin(FROWN_W / 2 / FROWN_RADIUS);
+const FROWN_LINE_WIDTH = 3;
+
+function frownMouth(
+  scene: Phaser.Scene,
+  container: Phaser.GameObjects.Container,
+  sprite: Phaser.GameObjects.Image,
+): EffectHandle {
+  const [cx, cy] = localOf(sprite, FROWN_LEFT + FROWN_W / 2, FROWN_TOP + FROWN_RADIUS);
+  const g = scene.add.graphics();
+  g.lineStyle(FROWN_LINE_WIDTH, COLORS.ink, 1);
+  g.beginPath();
+  g.arc(
+    cx,
+    cy,
+    FROWN_RADIUS,
+    Math.PI + (Math.PI / 2 - FROWN_HALF_ANGLE),
+    2 * Math.PI - (Math.PI / 2 - FROWN_HALF_ANGLE),
+  );
+  g.strokePath();
+  container.add(g);
+  return { tweens: [] };
+}
+
 const RECIPES: Record<string, Recipe> = {
   bob,
+  droop,
   "flame-pulse": flamePulse,
   "ground-shadow": groundShadow,
   blush,
+  "sad-eyebrows": sadEyebrows,
+  "sad-eyes": sadEyes,
   "heart-eyes": heartEyes,
   "kiss-mouth": kissMouth,
+  "tear-drip": tearDrip,
+  "frown-mouth": frownMouth,
   "flying-kiss": flyingKiss,
   bouquet,
   "floating-hearts": floatingHearts,
