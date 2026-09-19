@@ -1,4 +1,4 @@
-type Speaker = "SPIDEY" | "MJ" | "GOBLIN";
+export type Speaker = "SPIDEY" | "MJ" | "GOBLIN";
 export type RunStyle = "body" | "bold" | "shout" | "muted";
 type RunAccent = "red" | "purple" | "blue";
 
