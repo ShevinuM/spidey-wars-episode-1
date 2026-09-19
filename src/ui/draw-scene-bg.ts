@@ -24,21 +24,27 @@ interface Backdrop {
   readonly groundY: number;
 }
 
+// Scene 1.1 and 1.2's mockups draw byte-identical backdrops (stars, skylines, hero building, parapet,
+// rooftop props and antenna all match), so both ids point at this one baked `Backdrop`.
+const ROOFTOP: Backdrop = {
+  draw: drawScene11Backdrop,
+  groundY: PLAY_AREA.height - SCENE_1_1_GROUND_FROM_BOTTOM,
+};
+
 /**
- * One entry per scene id, each backed by one file under `backdrops/`.
+ * One entry per scene id, each pointing at a `Backdrop` object — usually one built from its own file
+ * under `backdrops/`, though an id may reuse another id's object when their mockups draw the same thing.
  *
- * Adding a backdrop means adding that file and one line here — nothing else in `drawSceneBg`,
- * `groundYOf`, or their callers changes. A backdrop file exports its ground line measured up from the
- * play area's own bottom edge, since importing `PLAY_AREA` back from here would cycle; this registry is
- * the one place that owns `PLAY_AREA.height` and converts that offset into the from-top `groundY` stored
- * below.
+ * Adding a backdrop with new artwork means adding that file and one line here — nothing else in
+ * `drawSceneBg`, `groundYOf`, or their callers changes. A backdrop file exports its ground line measured
+ * up from the play area's own bottom edge, since importing `PLAY_AREA` back from here would cycle; this
+ * registry is the one place that owns `PLAY_AREA.height` and converts that offset into the from-top
+ * `groundY` stored below.
  */
 const BACKDROPS: Record<string, Backdrop> = {
   demo: { draw: drawDemoBackdrop, groundY: PLAY_AREA.height - DEMO_GROUND_FROM_BOTTOM },
-  "scene-1-1": {
-    draw: drawScene11Backdrop,
-    groundY: PLAY_AREA.height - SCENE_1_1_GROUND_FROM_BOTTOM,
-  },
+  "scene-1-1": ROOFTOP,
+  "scene-1-2": ROOFTOP,
 };
 
 function backdropOf(id: string, caller: string): Backdrop {
