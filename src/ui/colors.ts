@@ -96,4 +96,18 @@ export const COLORS = {
   antennaPole: 0x2a4076,
   // `reference/design/Scene 1.2 - MJ rejects Goblin.dc.html:108` the Goblin's sad tear.
   tearBlue: 0x6fd1ff,
+  // `reference/design/Scene 2 - Rooftop Relief.dc.html:60` the rooftop water tower's tank.
+  waterTower: 0x1c2d5c,
+  // `reference/design/Scene 2 - Rooftop Relief.dc.html:60` the same tank's top inset highlight.
+  waterTowerHighlight: 0x2f4c8c,
+  // `reference/design/Scene 2 - Rooftop Relief.dc.html:61` the lid capping the tank.
+  waterTowerLid: 0x263c72,
+  // `reference/design/Scene 2 - Rooftop Relief.dc.html:62` the two legs the tank stands on.
+  waterTowerLeg: 0x1b2a55,
+  // `reference/design/Scene 2 - Rooftop Relief.dc.html:77` the roof slab's deck surface below its cap.
+  roofSlabSurface: 0x16244a,
+  // `reference/design/Scene 2 - Rooftop Relief.dc.html:77` the dark horizontal seam ruled across that deck.
+  roofSlabSeamDark: 0x000000,
+  // `reference/design/Scene 2 - Rooftop Relief.dc.html:78` the slab's shadowed edge face at the ledge.
+  roofSlabEdge: 0x0c1630,
 } as const;
