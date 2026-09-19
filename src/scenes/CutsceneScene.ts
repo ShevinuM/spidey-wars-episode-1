@@ -10,7 +10,7 @@ import {
   type PlayerPhase,
   type PlayerState,
 } from "../cutscene/player.ts";
-import { beatCharCount, type Beat, type Speaker } from "../cutscene/script.ts";
+import { beatCharCount, type ActorPlacement, type Beat, type Speaker } from "../cutscene/script.ts";
 import {
   advance as advanceStepper,
   newStepper,
@@ -221,7 +221,7 @@ export class CutsceneScene extends Phaser.Scene {
       this.beatObjects.push(image);
 
       if (placement.tag) {
-        this.beatObjects.push(this.buildSpeakerTag(image, placement.tag));
+        this.beatObjects.push(this.buildSpeakerTag(image, placement.tag, placement.tagAt));
       }
     }
 
@@ -251,14 +251,27 @@ export class CutsceneScene extends Phaser.Scene {
     this.beatObjects.push(plaque);
   }
 
-  /** Builds a name tag centred above `image`'s top edge, offset by `TAG_GAP_ABOVE_SPRITE`. */
+  /**
+   * Builds `image`'s name tag.
+   *
+   * `tagAt`, when given, plants the tag's fill-box top-left at the sprite's rendered top-left plus
+   * `(dx, dy)`; omitted, the tag centres above the sprite's top edge, offset by `TAG_GAP_ABOVE_SPRITE`.
+   */
   private buildSpeakerTag(
     image: Phaser.GameObjects.Image,
     tag: Speaker,
+    tagAt: ActorPlacement["tagAt"],
   ): Phaser.GameObjects.Container {
+    if (tagAt) {
+      // includeParent: true, so a sprite later parented to a container still reports its world position.
+      const spriteTop = image.getTopCenter(undefined, true);
+      const fillX = spriteTop.x - image.displayWidth / 2 + tagAt.dx;
+      const fillY = spriteTop.y + tagAt.dy;
+      return createSpeakerTag(this, fillX, fillY, tag);
+    }
     const container = createSpeakerTag(this, 0, 0, tag);
     const bounds = container.getBounds();
-    const top = image.getTopCenter();
+    const top = image.getTopCenter(undefined, true);
     const desiredLeft = top.x - bounds.width / 2;
     const desiredTop = top.y - TAG_GAP_ABOVE_SPRITE - bounds.height;
     container.setPosition(desiredLeft - bounds.x, desiredTop - bounds.y);

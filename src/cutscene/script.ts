@@ -25,6 +25,14 @@ export interface ActorPlacement {
   readonly scale?: number;
   readonly flipX?: boolean;
   readonly tag?: Speaker;
+
+  /**
+   * `dx`/`dy` place the tag's fill-box top-left that many mockup CSS pixels from the sprite's own
+   * rendered top-left.
+   *
+   * Omitted keeps the engine's own placement: the tag centred above the sprite's top edge.
+   */
+  readonly tagAt?: { readonly dx: number; readonly dy: number };
 }
 
 export interface Beat {
