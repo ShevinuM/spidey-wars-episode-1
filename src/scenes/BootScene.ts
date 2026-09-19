@@ -1,66 +1,120 @@
 import Phaser from "phaser";
+import {
+  BALLOON_BEVEL,
+  BALLOON_BORDER,
+  BALLOON_INNER_BORDER,
+  BALLOON_PAD,
+  BALLOON_SLICE,
+  PROMPT_PLAQUE_BORDER,
+  PROMPT_PLAQUE_CUT,
+  PROMPT_PLAQUE_INNER_CUT,
+  PROMPT_PLAQUE_SLICE,
+  TITLE_PLAQUE_BORDER,
+  TITLE_PLAQUE_CUT,
+  TITLE_PLAQUE_INNER_CUT,
+  TITLE_PLAQUE_SLICE,
+} from "../config/tuning.ts";
+import { crtOverlay } from "../ui/crt-overlay.ts";
+import { COLORS } from "../ui/colors.ts";
+import { bevel, octagon, plaque, type GradientStop, vGradient } from "../ui/primitives.ts";
 
-/** Sky gradient stops, ported from reference/design/*.dc.html. */
-const SKY_GRADIENT: ReadonlyArray<{ stop: number; color: number }> = [
-  { stop: 0, color: 0x04081c },
-  { stop: 0.3, color: 0x071130 },
-  { stop: 0.58, color: 0x0d1c45 },
-  { stop: 0.82, color: 0x16274f },
-  { stop: 1, color: 0x223256 },
+/** Sky gradient stops, ported from `reference/design/*.dc.html`'s scene backdrop (the six non-HUD mockups share this stop set). */
+const SKY_GRADIENT: readonly GradientStop[] = [
+  { stop: 0, color: COLORS.skyTop },
+  { stop: 0.3, color: COLORS.skyUpper },
+  { stop: 0.58, color: COLORS.skyMid },
+  { stop: 0.82, color: COLORS.skyLow },
+  { stop: 1, color: COLORS.skyBottom },
 ];
 
-/**
- * Interpolates the packed-RGB sky gradient at t in [0, 1], lerping the R, G
- * and B channels separately (never the packed integer — that muddies hue).
- */
-function skyColorAt(
-  t: number,
-  stops: ReadonlyArray<{ stop: number; color: number }> = SKY_GRADIENT,
-): number {
-  const clamped = Math.min(1, Math.max(0, t));
-
-  let lower = stops[0];
-  let upper = stops[stops.length - 1];
-  for (let i = 0; i < stops.length - 1; i++) {
-    if (clamped >= stops[i].stop && clamped <= stops[i + 1].stop) {
-      lower = stops[i];
-      upper = stops[i + 1];
-      break;
-    }
-  }
-
-  const span = upper.stop - lower.stop;
-  const localT = span === 0 ? 0 : (clamped - lower.stop) / span;
-
-  const lr = (lower.color >> 16) & 0xff;
-  const lg = (lower.color >> 8) & 0xff;
-  const lb = lower.color & 0xff;
-  const ur = (upper.color >> 16) & 0xff;
-  const ug = (upper.color >> 8) & 0xff;
-  const ub = upper.color & 0xff;
-
-  const r = Math.round(lr + (ur - lr) * localT);
-  const g = Math.round(lg + (ug - lg) * localT);
-  const b = Math.round(lb + (ub - lb) * localT);
-
-  return (r << 16) | (g << 8) | b;
-}
+const BAKE_WIDTH = 1280;
+const BAKE_HEIGHT = 720;
 
 export class BootScene extends Phaser.Scene {
   constructor() {
     super("BootScene");
   }
 
-  create(): void {
-    const { width, height } = this.scale;
-    const graphics = this.add.graphics();
+  preload(): void {
+    this.load.bitmapFont("pressstart-8", "fonts/pressstart-8.png", "fonts/pressstart-8.xml");
+    this.load.bitmapFont("pressstart-16", "fonts/pressstart-16.png", "fonts/pressstart-16.xml");
+    this.load.bitmapFont("pressstart-24", "fonts/pressstart-24.png", "fonts/pressstart-24.xml");
+    this.load.bitmapFont("silkscreen-8", "fonts/silkscreen-8.png", "fonts/silkscreen-8.xml");
+    this.load.bitmapFont("silkscreen-16", "fonts/silkscreen-16.png", "fonts/silkscreen-16.xml");
+    this.load.bitmapFont(
+      "silkscreen-bold-16",
+      "fonts/silkscreen-bold-16.png",
+      "fonts/silkscreen-bold-16.xml",
+    );
+    this.load.atlas("sprites", "sprites/atlas.png", "sprites/atlas.json");
+  }
 
-    for (let y = 0; y < height; y++) {
-      const t = y / height;
-      graphics.fillStyle(skyColorAt(t), 1);
-      graphics.fillRect(0, y, width, 1);
-    }
+  create(): void {
+    this.bake("sky", BAKE_WIDTH, BAKE_HEIGHT, (g) => {
+      vGradient(g, 0, 0, BAKE_WIDTH, BAKE_HEIGHT, SKY_GRADIENT);
+    });
+
+    this.bake("crt", BAKE_WIDTH, BAKE_HEIGHT, (g) => {
+      crtOverlay(g, BAKE_WIDTH, BAKE_HEIGHT);
+    });
+
+    this.bake("plaque-9", PROMPT_PLAQUE_SLICE.width, PROMPT_PLAQUE_SLICE.height, (g) => {
+      plaque(g, 0, 0, PROMPT_PLAQUE_SLICE.width, PROMPT_PLAQUE_SLICE.height, {
+        cut: PROMPT_PLAQUE_CUT,
+        innerCut: PROMPT_PLAQUE_INNER_CUT,
+        border: PROMPT_PLAQUE_BORDER,
+        borderColor: COLORS.frameBlue,
+        fillColor: COLORS.plaqueFill,
+      });
+    });
+
+    this.bake("title-plaque-9", TITLE_PLAQUE_SLICE.width, TITLE_PLAQUE_SLICE.height, (g) => {
+      plaque(g, 0, 0, TITLE_PLAQUE_SLICE.width, TITLE_PLAQUE_SLICE.height, {
+        cut: TITLE_PLAQUE_CUT,
+        innerCut: TITLE_PLAQUE_INNER_CUT,
+        border: TITLE_PLAQUE_BORDER,
+        borderColor: COLORS.frameBlue,
+        fillColor: COLORS.titleFill,
+      });
+    });
+
+    this.bake("balloon-9", BALLOON_SLICE.width, BALLOON_SLICE.height, (g) => {
+      const { width: w, height: h } = BALLOON_SLICE;
+      octagon(g, 0, 0, w, h, 0, COLORS.ink);
+      octagon(
+        g,
+        BALLOON_BORDER,
+        BALLOON_BORDER,
+        w - 2 * BALLOON_BORDER,
+        h - 2 * BALLOON_BORDER,
+        0,
+        COLORS.paper,
+      );
+      const frameInset = BALLOON_BORDER + BALLOON_PAD;
+      bevel(g, frameInset, frameInset, w - 2 * frameInset, h - 2 * frameInset, {
+        fillColor: COLORS.paper,
+        outlineColor: COLORS.frameBlue,
+        highlightColor: COLORS.paper,
+        shadowColor: COLORS.frameMid,
+        outlineWidth: BALLOON_INNER_BORDER,
+        bevelWidth: BALLOON_BEVEL,
+      });
+    });
 
     window.__READY__ = true;
+    this.scene.launch("TitleScene");
+  }
+
+  /** Draws into a throwaway `Graphics` object, snapshots it as a texture, then destroys it — never left in the display list (`docs/rules/tech-stack/phaser.md` R005). */
+  private bake(
+    key: string,
+    width: number,
+    height: number,
+    draw: (g: Phaser.GameObjects.Graphics) => void,
+  ): void {
+    const g = this.make.graphics({}, false);
+    draw(g);
+    g.generateTexture(key, width, height);
+    g.destroy();
   }
 }
