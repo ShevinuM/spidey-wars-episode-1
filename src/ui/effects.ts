@@ -1,6 +1,8 @@
 import type Phaser from "phaser";
 import { steppedEase } from "../cutscene/effects.ts";
+import { STAGE_2X_ZOOM } from "./backdrops/stage-2x.ts";
 import { COLORS } from "./colors.ts";
+import { PLAY_AREA } from "./draw-scene-bg.ts";
 
 export interface EffectHandle {
   readonly tweens: readonly Phaser.Tweens.Tween[];
@@ -23,6 +25,21 @@ function localOf(
   top: number,
 ): readonly [number, number] {
   return [-sprite.displayWidth / 2 + left, -sprite.displayHeight + top];
+}
+
+/**
+ * Converts a mockup's `left` and a height above the sprite's own rendered bottom edge into
+ * container-local coordinates, for an overlay the actor's feet anchor rather than his head.
+ *
+ * A 2.x mockup's stage zoom makes our integer-scaled sprite a little taller than the one it draws, so a
+ * shadow measured down from the head would float clear of the roof; measured up from the feet it lands.
+ */
+function localOfFeet(
+  sprite: Phaser.GameObjects.Image,
+  left: number,
+  aboveFeet: number,
+): readonly [number, number] {
+  return [-sprite.displayWidth / 2 + left, -aboveFeet];
 }
 
 // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:107` — the eye's box-shadow squares, in 3px cell
@@ -649,6 +666,138 @@ function haFloat(
   return { tweens };
 }
 
+// `reference/design/Scene 2 - Rooftop Relief.dc.html:83` Spidey's wrapper, whose box is his `<img>`'s box.
+const SPIDEY_WRAPPER_LEFT = 556;
+const SPIDEY_WRAPPER_BOTTOM = 250;
+const SPIDEY_WRAPPER_HEIGHT = 400;
+// The wrapper's top edge, as a height above the stage's own bottom, which is what a dot's `bottom:` is measured from.
+const SPIDEY_WRAPPER_TOP = SPIDEY_WRAPPER_BOTTOM + SPIDEY_WRAPPER_HEIGHT;
+
+// `reference/design/Scene 2 - Rooftop Relief.dc.html:21,84` `animation: shiver 3.4s steps(2, end)` — translateX 0 to 2px and back, on the whole actor.
+const SHIVER_DX = 2;
+const SHIVER_STEPS = 2;
+const SHIVER_DURATION_MS = 1700;
+
+function shiver(scene: Phaser.Scene, container: Phaser.GameObjects.Container): EffectHandle {
+  const tween = scene.tweens.add({
+    targets: container,
+    x: container.x + Math.round(SHIVER_DX * STAGE_2X_ZOOM),
+    duration: SHIVER_DURATION_MS,
+    yoyo: true,
+    repeat: -1,
+    ease: steppedEase(SHIVER_STEPS),
+  });
+  return { tweens: [tween] };
+}
+
+// `reference/design/Scene 2 - Rooftop Relief.dc.html:85` a 224x16 shadow at `left: -8; top: 394` in the 400-tall wrapper, so its top sits 6px above his feet.
+const FEET_SHADOW_LEFT = -8;
+const FEET_SHADOW_TOP = 394;
+const FEET_SHADOW_W = 224;
+const FEET_SHADOW_H = 16;
+// The gradient's `rgba(6, 12, 32, .7)` centre stop fades to nothing at 70%, so the flat fill that stands in
+// for it is taken down to the same 0.5 the 1.x ground shadow uses, since a Shape has no gradient fill.
+const FEET_SHADOW_ALPHA = 0.5;
+
+function feetShadow(
+  scene: Phaser.Scene,
+  container: Phaser.GameObjects.Container,
+  sprite: Phaser.GameObjects.Image,
+): EffectHandle {
+  const [left, top] = localOfFeet(
+    sprite,
+    FEET_SHADOW_LEFT * STAGE_2X_ZOOM,
+    (SPIDEY_WRAPPER_HEIGHT - FEET_SHADOW_TOP) * STAGE_2X_ZOOM,
+  );
+  const w = FEET_SHADOW_W * STAGE_2X_ZOOM;
+  const h = FEET_SHADOW_H * STAGE_2X_ZOOM;
+  const shadow = scene.add
+    .ellipse(left + w / 2, top + h / 2, w, h, COLORS.groundShadow)
+    .setAlpha(FEET_SHADOW_ALPHA);
+  container.add(shadow);
+  return { tweens: [] };
+}
+
+interface StreamDot {
+  /** The mockup's own stage-local `left:`. */
+  readonly x: number;
+  /** The mockup's own stage-local `bottom:`. */
+  readonly bottom: number;
+  readonly size: number;
+  readonly delayMs: number;
+}
+
+// `reference/design/Scene 2 - Rooftop Relief.dc.html:176-191` the arc's own 44-step arithmetic at the
+// default `streamReach` of 1: the outward travel eases off, the fall accelerates, and the dot grows in
+// two thresholds, ported as arithmetic rather than a baked table so it stays the mockup's own numbers.
+const STREAM_COUNT = 44;
+const STREAM_START_X = 668;
+const STREAM_START_BOTTOM = 394;
+const STREAM_END_BOTTOM = -40;
+const STREAM_END_X = STREAM_START_X + 470;
+const STREAM_DELAY_STEP_MS = 50;
+
+function streamDots(): readonly StreamDot[] {
+  const dots: StreamDot[] = [];
+  for (let i = 0; i < STREAM_COUNT; i++) {
+    const t = i / (STREAM_COUNT - 1);
+    const xt = 1 - (1 - t) * (1 - t);
+    const bt = t * t;
+    dots.push({
+      x: Math.round(STREAM_START_X + (STREAM_END_X - STREAM_START_X) * xt),
+      bottom: Math.round(STREAM_START_BOTTOM - (STREAM_START_BOTTOM - STREAM_END_BOTTOM) * bt),
+      size: i < 6 ? 6 : i < 22 ? 7 : 8,
+      delayMs: i * STREAM_DELAY_STEP_MS,
+    });
+  }
+  return dots;
+}
+
+const STREAM_DOTS = streamDots();
+
+// `reference/design/Scene 2 - Rooftop Relief.dc.html:20,97` `animation: stream 0.5s steps(2, end)` — opacity 1 to .55 and back, each dot 50ms behind the last.
+const STREAM_ALPHA_TO = 0.55;
+const STREAM_STEPS = 2;
+const STREAM_DURATION_MS = 250;
+
+function streamArc(
+  scene: Phaser.Scene,
+  container: Phaser.GameObjects.Container,
+  sprite: Phaser.GameObjects.Image,
+): EffectHandle {
+  // The tail of the arc falls past the bottom of the mockup's own frame, and `drawSceneBg` has already
+  // painted the octagon frame panels by the time an overlay draws, so a dot below the play area is dropped.
+  const playBottom = PLAY_AREA.y + PLAY_AREA.height;
+  const tweens: Phaser.Tweens.Tween[] = [];
+  for (const dot of STREAM_DOTS) {
+    const [left, top] = localOf(
+      sprite,
+      (dot.x - SPIDEY_WRAPPER_LEFT) * STAGE_2X_ZOOM,
+      (SPIDEY_WRAPPER_TOP - dot.bottom - dot.size) * STAGE_2X_ZOOM,
+    );
+    if (container.y + top >= playBottom) {
+      continue;
+    }
+    const size = dot.size * STAGE_2X_ZOOM;
+    const drop = scene.add
+      .rectangle(left + size / 2, top + size / 2, size, size, COLORS.streamDrop)
+      .setAlpha(1);
+    container.add(drop);
+    tweens.push(
+      scene.tweens.add({
+        targets: drop,
+        alpha: STREAM_ALPHA_TO,
+        duration: STREAM_DURATION_MS,
+        delay: dot.delayMs,
+        yoyo: true,
+        repeat: -1,
+        ease: steppedEase(STREAM_STEPS),
+      }),
+    );
+  }
+  return { tweens };
+}
+
 const RECIPES: Record<string, Recipe> = {
   bob,
   droop,
@@ -667,6 +816,9 @@ const RECIPES: Record<string, Recipe> = {
   "cackle-mouth": cackleMouth,
   "tear-fall": tearFall,
   "ha-float": haFloat,
+  shiver,
+  "feet-shadow": feetShadow,
+  "stream-arc": streamArc,
 };
 
 /**
