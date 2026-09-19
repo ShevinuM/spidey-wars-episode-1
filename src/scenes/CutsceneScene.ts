@@ -31,6 +31,7 @@ import { createSpeakerTag } from "../ui/speaker-tag.ts";
 
 interface CutsceneSceneData {
   readonly id?: string;
+  readonly blink?: boolean;
 }
 
 interface CutsceneState {
@@ -96,6 +97,7 @@ function defaultScaleOf(frame: string): number {
 export class CutsceneScene extends Phaser.Scene {
   private id!: string;
   private script!: readonly Beat[];
+  private blinkEnabled = true;
 
   /**
    * Invariant: `stepper.step` and `player.elapsedSteps` stay equal at all times.
@@ -122,6 +124,7 @@ export class CutsceneScene extends Phaser.Scene {
     }
     this.id = id;
     this.script = script;
+    this.blinkEnabled = data.blink ?? true;
     this.stepper = newStepper();
     this.player = newPlayer();
     this.beatObjects = [];
@@ -242,7 +245,7 @@ export class CutsceneScene extends Phaser.Scene {
       label: "PRESS SPACE TO CONTINUE",
       centerX: WIDTH / 2,
       bottomY: HEIGHT - PLAY_AREA.y - PROMPT_BOTTOM_INSET,
-      blink: true,
+      blink: this.blinkEnabled,
     });
     this.plaque = plaque;
     this.beatObjects.push(plaque);
