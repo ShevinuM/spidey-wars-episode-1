@@ -64,4 +64,34 @@ export const COLORS = {
   heartFloat2: 0xff8ba0,
   // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:132` the third floating heart.
   heartFloat3: 0xffb3c2,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:200` the star field's white pick.
+  starWhite: 0xffffff,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:200` the star field's blue pick.
+  starBlue: 0x9fc4ff,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:200` the star field's deep-blue pick.
+  starBlueDeep: 0x7fa8e8,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:40` the moon's blurred box-shadow glow.
+  moonGlow: 0x96beff,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:188` the mid skyline's blue window tint.
+  windowBlue: 0x7ebef0,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:66,188` the amber window tint shared by the hero facade and the mid skyline.
+  windowAmber: 0xf2c85a,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:60` the street haze's 55% gradient stop.
+  hazeAmber1: 0xffa84a,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:60` the street haze's bottom-edge gradient stop.
+  hazeAmber2: 0xffbe6e,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:66` the hero facade's left inset highlight band.
+  skyHighlightBlue: 0x78afe6,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:69` the roof deck's own fill.
+  roofDeckBase: 0x33508f,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:69` the roof deck's top inset highlight.
+  roofDeckHighlight: 0x5d8fd6,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:70` the roof deck's lower cap strip.
+  roofDeckShade: 0x24386e,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:78,83` the rooftop AC units' fill.
+  acUnit: 0x22366b,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:78,83` the rooftop AC units' top inset highlight.
+  acUnitHighlight: 0x3a5c9e,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:86,88` the antenna pole and its cap.
+  antennaPole: 0x2a4076,
 } as const;

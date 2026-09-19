@@ -1,5 +1,6 @@
 import type Phaser from "phaser";
 import { DEMO_GROUND_FROM_BOTTOM, drawDemoBackdrop } from "./backdrops/demo.ts";
+import { drawScene11Backdrop, SCENE_1_1_GROUND_FROM_BOTTOM } from "./backdrops/scene-1-1.ts";
 import { COLORS } from "./colors.ts";
 import { octagon } from "./primitives.ts";
 
@@ -34,6 +35,10 @@ interface Backdrop {
  */
 const BACKDROPS: Record<string, Backdrop> = {
   demo: { draw: drawDemoBackdrop, groundY: PLAY_AREA.height - DEMO_GROUND_FROM_BOTTOM },
+  "scene-1-1": {
+    draw: drawScene11Backdrop,
+    groundY: PLAY_AREA.height - SCENE_1_1_GROUND_FROM_BOTTOM,
+  },
 };
 
 function backdropOf(id: string, caller: string): Backdrop {
