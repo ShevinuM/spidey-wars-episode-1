@@ -44,4 +44,24 @@ export const COLORS = {
   textGoblin: 0xd9b6ff,
   // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:95` the MJ name tag's dot.
   redSoft: 0xff8d86,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:93` MJ's ground-shadow radial glow.
+  groundShadow: 0x060c20,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:123` the Goblin glider's engine glow.
+  flameGlow: 0xff9500,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:104` the Goblin's blush, also his flying-kiss heart (112) and first floating heart (130).
+  blushPink: 0xff5c7a,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:107` the heart-eyes pixel shape.
+  heartEye: 0xff2d55,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:110` the puckered kiss mouth, also the bouquet's second flower centre (119).
+  kissMouth: 0xc81e4a,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:115` the bouquet's stem.
+  stemGreen: 0x2f7d3a,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:117` the bouquet's first flower centre.
+  petalCenter: 0xffe27a,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:118` the bouquet's second flower, also its third centre (121).
+  petalGold: 0xffd166,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:131` the second floating heart.
+  heartFloat2: 0xff8ba0,
+  // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:132` the third floating heart.
+  heartFloat3: 0xffb3c2,
 } as const;

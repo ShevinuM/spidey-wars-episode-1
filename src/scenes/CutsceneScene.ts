@@ -10,7 +10,14 @@ import {
   type PlayerPhase,
   type PlayerState,
 } from "../cutscene/player.ts";
-import { beatCharCount, type ActorPlacement, type Beat, type Speaker } from "../cutscene/script.ts";
+import {
+  beatCharCount,
+  type ActorPlacement,
+  type BalloonAnchorX,
+  type BalloonPlacement,
+  type Beat,
+  type Speaker,
+} from "../cutscene/script.ts";
 import {
   advance as advanceStepper,
   newStepper,
@@ -26,6 +33,7 @@ import {
 } from "../ui/balloon.ts";
 import { crtOverlay } from "../ui/crt-overlay.ts";
 import { drawSceneBg, groundYOf, PLAY_AREA } from "../ui/draw-scene-bg.ts";
+import { attachEffect } from "../ui/effects.ts";
 import { createPressPlaque } from "../ui/press-plaque.ts";
 import { createSpeakerTag } from "../ui/speaker-tag.ts";
 
@@ -50,21 +58,43 @@ const CRT_PLAY_KEY = "crt-play";
 // Px between a tagged actor's sprite top and the name tag's ring.
 const TAG_GAP_ABOVE_SPRITE = 10;
 
-// Ruling 43 — `Scene 2.1 - Spider-Sense.dc.html:128-129` puts a 400px paper box 25px from the play
-// area's right edge and 118px from its top, and the nine-slice `createBalloon` draws is that box plus
-// the `BALLOON_BORDER`-wide ink ring on every edge.
-const BALLOON_PAPER_WIDTH = 400;
-const BALLOON_RIGHT_INSET = 25;
-const BALLOON_TOP_INSET = 118;
-const BALLOON_WIDTH = BALLOON_PAPER_WIDTH + 2 * BALLOON_BORDER;
-const BALLOON_X =
-  PLAY_AREA.x + PLAY_AREA.width - (BALLOON_RIGHT_INSET - BALLOON_BORDER) - BALLOON_WIDTH;
-const BALLOON_Y = PLAY_AREA.y + (BALLOON_TOP_INSET - BALLOON_BORDER);
+// `Scene 2.1 - Spider-Sense.dc.html:128-129,135` — a beat with no `balloon` of its own gets this
+// placement: a 400px paper box 25px from the play area's right edge, 118px from its top, its tail
+// centred at 52% of the balloon's own final height.
+const DEFAULT_BALLOON: BalloonPlacement = {
+  paperWidth: 400,
+  anchorX: { from: "right", offset: 25 },
+  top: 118,
+  tail: { side: "left", atHeightFraction: 0.52 },
+};
 
-// `Scene 2.1 - Spider-Sense.dc.html:135` puts the tail's centre at `top: 52%` of the balloon's own
-// height; `createBalloon` resolves the fraction itself against the final height, so this scene never
-// needs to know the balloon's pixel height.
-const BALLOON_TAIL_AT_HEIGHT_FRACTION = 0.52;
+/** `anchorX`'s left edge, resolved against a balloon of the given outer `width` — the nine-slice draws `BALLOON_BORDER` px outside the mockup's own paper-box edge in every direction. */
+function resolveBalloonX(anchorX: BalloonAnchorX, width: number): number {
+  switch (anchorX.from) {
+    case "center":
+      return PLAY_AREA.x + (PLAY_AREA.width - width) / 2;
+    case "left":
+      return PLAY_AREA.x + anchorX.offset - BALLOON_BORDER;
+    case "right":
+      return PLAY_AREA.x + PLAY_AREA.width - (anchorX.offset - BALLOON_BORDER) - width;
+  }
+}
+
+/** Converts a `BalloonPlacement`'s mockup paper-box terms into `createBalloon`'s outer nine-slice edge. */
+function resolveBalloon(placement: BalloonPlacement): {
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly tail: BalloonTail;
+} {
+  const width = placement.paperWidth + 2 * BALLOON_BORDER;
+  return {
+    x: resolveBalloonX(placement.anchorX, width),
+    y: PLAY_AREA.y + (placement.top - BALLOON_BORDER),
+    width,
+    tail: placement.tail,
+  };
+}
 
 // `Scene 2.1 - Spider-Sense.dc.html:144` `bottom: 18px` of the play area.
 const PROMPT_BOTTOM_INSET = 18;
@@ -109,6 +139,7 @@ export class CutsceneScene extends Phaser.Scene {
   private player: PlayerState = newPlayer();
 
   private beatObjects: Phaser.GameObjects.GameObject[] = [];
+  private effectTweens: Phaser.Tweens.Tween[] = [];
   private balloon: Balloon | undefined;
   private plaque: Phaser.GameObjects.Container | undefined;
 
@@ -128,6 +159,7 @@ export class CutsceneScene extends Phaser.Scene {
     this.stepper = newStepper();
     this.player = newPlayer();
     this.beatObjects = [];
+    this.effectTweens = [];
     this.balloon = undefined;
     this.plaque = undefined;
   }
@@ -202,8 +234,10 @@ export class CutsceneScene extends Phaser.Scene {
     this.sync();
   }
 
-  /** Destroys the previous beat's actors, tags, balloon and plaque, then builds the current beat's. */
+  /** Destroys the previous beat's actors, tags, effects, balloon and plaque, then builds the current beat's. */
   private rebuildBeat(): void {
+    for (const tween of this.effectTweens) this.tweens.remove(tween);
+    this.effectTweens = [];
     for (const obj of this.beatObjects) obj.destroy();
     this.beatObjects = [];
 
@@ -213,26 +247,34 @@ export class CutsceneScene extends Phaser.Scene {
     for (const placement of beat.actors) {
       const localY = placement.y ?? groundY;
       const scale = placement.scale ?? defaultScaleOf(placement.frame);
+      const container = this.add.container(PLAY_AREA.x + placement.x, PLAY_AREA.y + localY);
       const image = this.add
-        .image(PLAY_AREA.x + placement.x, PLAY_AREA.y + localY, "sprites", placement.frame)
+        .image(0, 0, "sprites", placement.frame)
         .setOrigin(0.5, 1)
         .setScale(scale)
         .setFlipX(placement.flipX ?? false);
-      this.beatObjects.push(image);
+      container.add(image);
+
+      for (const effectId of placement.effects ?? []) {
+        const handle = attachEffect(this, container, image, effectId);
+        this.effectTweens.push(...handle.tweens);
+      }
+
+      this.beatObjects.push(container);
 
       if (placement.tag) {
         this.beatObjects.push(this.buildSpeakerTag(image, placement.tag, placement.tagAt));
       }
     }
 
-    const tail: BalloonTail = { side: "left", atHeightFraction: BALLOON_TAIL_AT_HEIGHT_FRACTION };
+    const resolvedBalloon = resolveBalloon(beat.balloon ?? DEFAULT_BALLOON);
     const balloonOptions: BalloonOptions = {
-      x: BALLOON_X,
-      y: BALLOON_Y,
-      width: BALLOON_WIDTH,
+      x: resolvedBalloon.x,
+      y: resolvedBalloon.y,
+      width: resolvedBalloon.width,
       lines: beat.lines,
       speaker: beat.speaker,
-      tail,
+      tail: resolvedBalloon.tail,
     };
     const balloon = createBalloon(this, balloonOptions);
     // Ruling 39 — set once here, in the same `create`/`rebuildBeat` pass that builds the balloon, so it
@@ -271,6 +313,7 @@ export class CutsceneScene extends Phaser.Scene {
     }
     const container = createSpeakerTag(this, 0, 0, tag);
     const bounds = container.getBounds();
+    // `image` is a child of its actor container, so its world position must include that parent.
     const top = image.getTopCenter(undefined, true);
     const desiredLeft = top.x - bounds.width / 2;
     const desiredTop = top.y - TAG_GAP_ABOVE_SPRITE - bounds.height;
