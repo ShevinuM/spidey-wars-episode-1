@@ -6,6 +6,7 @@ import {
   buildSkyline2x,
   SKYLINE_2X_SEED,
   stageFill,
+  STAGE_2X_ZOOM,
   stageX,
   stageY,
   type Stage2x,
@@ -20,9 +21,8 @@ const SKY_GRADIENT: readonly GradientStop[] = [
   { stop: 1, color: COLORS.skyBottom },
 ];
 
-// `reference/design/Scene 2 - Rooftop Relief.dc.html:40` the stage wrapper: 1080px wide, centred, under `zoom: 0.82`.
+// `reference/design/Scene 2 - Rooftop Relief.dc.html:40` the stage wrapper: 1080px wide and centred.
 const STAGE_WIDTH = 1080;
-const STAGE_ZOOM = 0.82;
 
 // `reference/design/Scene 2 - Rooftop Relief.dc.html:34` the seed star, 3×3 at (40, 26), whose `box-shadow` clones are the generated field.
 const STAR_ORIGIN_X = 40;
@@ -290,9 +290,9 @@ export function drawScene2Backdrop(
   const skyStars = stars(rand);
 
   const stage: Stage2x = {
-    x: x + (w - STAGE_WIDTH * STAGE_ZOOM) / 2,
+    x: x + (w - STAGE_WIDTH * STAGE_2X_ZOOM) / 2,
     bottomY: y + h,
-    zoom: STAGE_ZOOM,
+    zoom: STAGE_2X_ZOOM,
     clip: { left: x, top: y, right: x + w, bottom: y + h },
   };
 

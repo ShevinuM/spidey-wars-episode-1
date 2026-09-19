@@ -1,5 +1,6 @@
 import type Phaser from "phaser";
 import { steppedEase } from "../cutscene/effects.ts";
+import { STAGE_2X_ZOOM } from "./backdrops/stage-2x.ts";
 import { COLORS } from "./colors.ts";
 import { PLAY_AREA } from "./draw-scene-bg.ts";
 
@@ -665,10 +666,6 @@ function haFloat(
   return { tweens };
 }
 
-// `reference/design/Scene 2 - Rooftop Relief.dc.html:40` the stage wrapper's own `zoom`, which scales
-// every stage-local length below it — an overlay's width and height as much as its offsets.
-const SCENE_2_ZOOM = 0.82;
-
 // `reference/design/Scene 2 - Rooftop Relief.dc.html:83` Spidey's wrapper, whose box is his `<img>`'s box.
 const SPIDEY_WRAPPER_LEFT = 556;
 const SPIDEY_WRAPPER_BOTTOM = 250;
@@ -684,7 +681,7 @@ const SHIVER_DURATION_MS = 1700;
 function shiver(scene: Phaser.Scene, container: Phaser.GameObjects.Container): EffectHandle {
   const tween = scene.tweens.add({
     targets: container,
-    x: container.x + Math.round(SHIVER_DX * SCENE_2_ZOOM),
+    x: container.x + Math.round(SHIVER_DX * STAGE_2X_ZOOM),
     duration: SHIVER_DURATION_MS,
     yoyo: true,
     repeat: -1,
@@ -709,11 +706,11 @@ function feetShadow(
 ): EffectHandle {
   const [left, top] = localOfFeet(
     sprite,
-    FEET_SHADOW_LEFT * SCENE_2_ZOOM,
-    (SPIDEY_WRAPPER_HEIGHT - FEET_SHADOW_TOP) * SCENE_2_ZOOM,
+    FEET_SHADOW_LEFT * STAGE_2X_ZOOM,
+    (SPIDEY_WRAPPER_HEIGHT - FEET_SHADOW_TOP) * STAGE_2X_ZOOM,
   );
-  const w = FEET_SHADOW_W * SCENE_2_ZOOM;
-  const h = FEET_SHADOW_H * SCENE_2_ZOOM;
+  const w = FEET_SHADOW_W * STAGE_2X_ZOOM;
+  const h = FEET_SHADOW_H * STAGE_2X_ZOOM;
   const shadow = scene.add
     .ellipse(left + w / 2, top + h / 2, w, h, COLORS.groundShadow)
     .setAlpha(FEET_SHADOW_ALPHA);
@@ -775,13 +772,13 @@ function streamArc(
   for (const dot of STREAM_DOTS) {
     const [left, top] = localOf(
       sprite,
-      (dot.x - SPIDEY_WRAPPER_LEFT) * SCENE_2_ZOOM,
-      (SPIDEY_WRAPPER_TOP - dot.bottom - dot.size) * SCENE_2_ZOOM,
+      (dot.x - SPIDEY_WRAPPER_LEFT) * STAGE_2X_ZOOM,
+      (SPIDEY_WRAPPER_TOP - dot.bottom - dot.size) * STAGE_2X_ZOOM,
     );
     if (container.y + top >= playBottom) {
       continue;
     }
-    const size = dot.size * SCENE_2_ZOOM;
+    const size = dot.size * STAGE_2X_ZOOM;
     const drop = scene.add
       .rectangle(left + size / 2, top + size / 2, size, size, COLORS.streamDrop)
       .setAlpha(1);
