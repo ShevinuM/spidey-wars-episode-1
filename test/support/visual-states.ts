@@ -11,5 +11,7 @@ export const visualStates: readonly string[] = [
   "scene-1-2-open",
   "scene-1-3-last",
   "scene-1-3-open",
+  "scene-2-last",
+  "scene-2-open",
   "title",
 ];
