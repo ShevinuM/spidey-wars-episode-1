@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import type { CutsceneScene } from "./scenes/CutsceneScene.ts";
 import { digest as simDigest } from "./sim/digest.ts";
 import { type Replay, runReplay } from "./sim/replay.ts";
 import { stepTo as simStepTo } from "./sim/tick.ts";
@@ -15,6 +16,12 @@ export interface TestHooks {
   state(): unknown;
   digest(): string;
   replay(input: Replay): { digest: string; trajectory: string[] };
+}
+
+/** The active `CutsceneScene` instance, or `null` if it is not currently active (see `goto`'s comment on `getScene`'s runtime-vs-type mismatch). */
+function activeCutscene(game: Phaser.Game): CutsceneScene | null {
+  const scene = game.scene.getScene("CutsceneScene") as CutsceneScene | null;
+  return scene !== null && scene.scene.isActive() ? scene : null;
 }
 
 export function installTestHooks(game: Phaser.Game): void {
@@ -54,12 +61,14 @@ export function installTestHooks(game: Phaser.Game): void {
 
     stepTo(n: number): void {
       simStepTo(world, n);
+      activeCutscene(game)?.stepTo(n);
     },
 
     state(): unknown {
       return {
         ...JSON.parse(JSON.stringify(world)),
         sceneClockMs: sceneClockProbe?.getElapsed() ?? null,
+        cutscene: activeCutscene(game)?.state() ?? null,
       };
     },
 
