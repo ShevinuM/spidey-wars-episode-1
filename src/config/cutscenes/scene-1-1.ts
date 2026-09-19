@@ -6,6 +6,8 @@ const MJ: ActorPlacement = {
   x: 761,
   flipX: true, // `Scene 1.1 - Goblin Asks MJ.dc.html:92` `transform: scaleX(-1)`.
   tag: "MJ",
+  // `Scene 1.1 - Goblin Asks MJ.dc.html:94` the tag sits in the wrapper, not the flipped `<img>`, so its offset is unaffected by `flipX`.
+  tagAt: { dx: 4, dy: -6 },
   effects: ["ground-shadow"], // `Scene 1.1 - Goblin Asks MJ.dc.html:93` the wrapper's only overlay.
 };
 
@@ -14,6 +16,7 @@ const GOBLIN: ActorPlacement = {
   frame: "goblin-hover",
   x: 460,
   tag: "GOBLIN",
+  tagAt: { dx: 2, dy: -6 }, // `Scene 1.1 - Goblin Asks MJ.dc.html:124`.
   // `Scene 1.1 - Goblin Asks MJ.dc.html:101-132` in DOM order — `bob` is the wrapper's own animation and adds no child, so it leads.
   effects: [
     "bob",
@@ -45,11 +48,12 @@ export const scene11: readonly Beat[] = [
         ],
       },
     ],
-    // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:138,144` — a 760px paper box centred, 76px from the play area's top, tail at the bottom-left 104px in.
+    // `reference/design/Scene 1.1 - Goblin Asks MJ.dc.html:138,144` — a 760px paper box centred, tail at the bottom-left 104px in.
     balloon: {
       paperWidth: 760,
       anchorX: { from: "center" },
-      top: 76,
+      // Held at 20, not `Scene 1.1 - Goblin Asks MJ.dc.html:138`'s `top: 76`, because our 188px balloon (16px baked body text against the mockup's 15px) at 76 would cover both tags.
+      top: 20,
       tail: { side: "bottom-left", offset: 104 },
     },
   },
