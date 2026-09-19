@@ -58,6 +58,7 @@ const STYLE_TINT: Record<RunStyle, number> = {
 /** A `Run.accent` overrides `STYLE_TINT` — editorial per span, not derivable from the speaker. */
 const ACCENT_TINT: Record<RunAccent, number> = {
   red: COLORS.redDeep,
+  scarlet: COLORS.red,
   purple: COLORS.purple,
   blue: COLORS.frameMid,
 };
