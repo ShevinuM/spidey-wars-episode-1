@@ -32,7 +32,7 @@ export const scene12: readonly Beat[] = [
     lines: [
       {
         runs: [
-          { text: "YOU WANT ME TO LOOK AT YOU?", style: "shout" },
+          { text: "YOU WANT ME TO LOOK AT YOU?", style: "shout", accent: "scarlet" },
           {
             text: " I can't. Not because you frighten me — because there's nothing there. ",
             style: "body",
