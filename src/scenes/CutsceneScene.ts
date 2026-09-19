@@ -61,13 +61,30 @@ const BALLOON_X =
 const BALLOON_Y = PLAY_AREA.y + (BALLOON_TOP_INSET - BALLOON_BORDER);
 
 // `Scene 2.1 - Spider-Sense.dc.html:135` puts the tail's centre at `top: 52%` of the balloon's own
-// height, but `createBalloon` needs `tail` before that height exists (ruling 43) — 192 is ≈52% of the
-// demo's first-beat balloon height of 369px, read back once against the real bitmap-font metrics while
-// building this scene.
-const BALLOON_TAIL_OFFSET = 192;
+// height; `createBalloon` resolves the fraction itself against the final height, so this scene never
+// needs to know the balloon's pixel height.
+const BALLOON_TAIL_AT_HEIGHT_FRACTION = 0.52;
 
 // `Scene 2.1 - Spider-Sense.dc.html:144` `bottom: 18px` of the play area.
 const PROMPT_BOTTOM_INSET = 18;
+
+function isSpriteScaleKey(frame: string): frame is keyof typeof SPRITE_SCALE {
+  return Object.hasOwn(SPRITE_SCALE, frame);
+}
+
+/**
+ * The scale an actor frame gets when its placement gives none. Ruling 48 — `ActorPlacement.frame` is a
+ * plain `string` in `src/cutscene/` (narrowing it to `SPRITE_SCALE`'s key union there would need
+ * `cutscene` to import `config`, closing a cycle against `config/flow.ts`'s import of `Beat`), so an
+ * unscaled placement with a frame absent from the table has no default scale and must fail loudly rather
+ * than silently rendering at Phaser's `setScale(undefined)` fallback of 1.
+ */
+function defaultScaleOf(frame: string): number {
+  if (!isSpriteScaleKey(frame)) {
+    throw new Error(`CutsceneScene: no SPRITE_SCALE entry for actor frame "${frame}"`);
+  }
+  return SPRITE_SCALE[frame];
+}
 
 /**
  * Plays one `Beat[]` script looked up by id (`src/config/flow.ts`'s `CUTSCENES`).
@@ -191,7 +208,7 @@ export class CutsceneScene extends Phaser.Scene {
 
     for (const placement of beat.actors) {
       const localY = placement.y ?? groundY;
-      const scale = placement.scale ?? SPRITE_SCALE[placement.frame as keyof typeof SPRITE_SCALE];
+      const scale = placement.scale ?? defaultScaleOf(placement.frame);
       const image = this.add
         .image(PLAY_AREA.x + placement.x, PLAY_AREA.y + localY, "sprites", placement.frame)
         .setOrigin(0.5, 1)
@@ -204,7 +221,7 @@ export class CutsceneScene extends Phaser.Scene {
       }
     }
 
-    const tail: BalloonTail = { side: "left", offset: BALLOON_TAIL_OFFSET };
+    const tail: BalloonTail = { side: "left", atHeightFraction: BALLOON_TAIL_AT_HEIGHT_FRACTION };
     const balloonOptions: BalloonOptions = {
       x: BALLOON_X,
       y: BALLOON_Y,

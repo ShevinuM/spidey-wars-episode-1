@@ -24,11 +24,15 @@ export interface BalloonOptions {
   readonly tail: BalloonTail;
 }
 
-export interface BalloonTail {
-  readonly side: "left" | "right" | "bottom-left" | "bottom-right";
-  /** Px from the balloon's top edge to the tail's centre for `left`/`right`; px from the balloon's left or right edge to its centre for the bottom sides. */
-  readonly offset: number;
-}
+/**
+ * Side tails (`Scene 2.1:135` `top: 52%`, `Scene 2:112` `top: 46%`) are placed as a fraction of the
+ * balloon's own height, resolved against the final height after every line is laid out; bottom tails
+ * (`Scene 1.1:144` `left: 104px`, `Scene 1.2:127` `right: 230px`) are placed as a pixel offset along the
+ * balloon's bottom edge — the mockups use two different units, split cleanly by side.
+ */
+export type BalloonTail =
+  | { readonly side: "left" | "right"; readonly atHeightFraction: number }
+  | { readonly side: "bottom-left" | "bottom-right"; readonly offset: number };
 
 export interface Balloon {
   readonly container: Phaser.GameObjects.Container;
@@ -165,7 +169,7 @@ function withRealMetrics<T>(scene: Phaser.Scene, use: (metrics: RunMetrics) => T
   }
 }
 
-/** The tail's centre, on the paper edge (balloon edge inset by `BALLOON_BORDER`) — `offset` places it along that edge. */
+/** The tail's centre, on the paper edge (balloon edge inset by `BALLOON_BORDER`) — a side tail is placed by `atHeightFraction` of the final `height`, a bottom tail by its pixel `offset` along that edge. */
 function tailCenter(
   x: number,
   y: number,
@@ -175,9 +179,9 @@ function tailCenter(
 ): readonly [number, number] {
   switch (tail.side) {
     case "left":
-      return [x + BALLOON_BORDER, y + tail.offset];
+      return [x + BALLOON_BORDER, y + Math.round(tail.atHeightFraction * height)];
     case "right":
-      return [x + width - BALLOON_BORDER, y + tail.offset];
+      return [x + width - BALLOON_BORDER, y + Math.round(tail.atHeightFraction * height)];
     case "bottom-left":
       return [x + tail.offset, y + height - BALLOON_BORDER];
     case "bottom-right":
