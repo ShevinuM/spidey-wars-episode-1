@@ -7,5 +7,7 @@ export const visualStates: readonly string[] = [
   "primitives-gallery",
   "scene-1-1-last",
   "scene-1-1-open",
+  "scene-1-2-last",
+  "scene-1-2-open",
   "title",
 ];
